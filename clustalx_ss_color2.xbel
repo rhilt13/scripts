@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<colorparam>
+   <rgbindex>
+      <color name = "RED" red = "239" green = "132" blue = "123"></color>
+      <color name = "BLUE" red = "132" green = "132" blue = "241"></color>
+      <color name = "ORANGE" red = "229" green = "153" blue = "76"></color>
+      <color name = "YELLOW" red = "200" green = "205" blue = "10"></color>
+   </rgbindex>
+   <consensus>
+   </consensus>
+   <colorrules>
+      <resrule residue = "h" colorname = "RED" conditions = ""></resrule>
+      <resrule residue = "e" colorname = "BLUE" conditions = ""></resrule>
+    </colorrules>
+</colorparam>

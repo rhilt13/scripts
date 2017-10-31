@@ -1,0 +1,8 @@
+#### parse c elegans mutant list file from cgc
+
+cat elegans_mutants_list.txt |sed 's/^[ \t]*//;s/[ \t]*$//'|tr -d '\015'|tr -d '\n'|perl -e 'while(<>){chomp;@a=split(/--------------------/,$_);}$ct=scalar(@a);print "$ct\n";foreach $st(@a){if ($st=~/Species: Caenorhabditis elegans/){print "$st\n";}}'|
+
+#### tabulate c elegans mutant list file
+#### elegans_mutants_list.txt.parsed.GTs > elegans_mutants_list.txt.parsed.GTs.tab
+
+less elegans_mutants_list.txt.parsed.GTs|sed 's/#Strain:/Strain:/g;s/#/ /g;s/Species:/\tSpecies:/g;s/Genotype:/\tGenotype:/g;s/Description:/\tDescription:/g;s/Mutagen:/\tMutagen:/g;s/Outcrossed:/\tOutcrossed:/g;s/Reference:/\tReference:/g;s/Made by:/\tMade by:/g;s/Received:/\tReceived:/g;' > elegans_mutants_list.txt.parsed.GTs.tab

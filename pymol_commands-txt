@@ -1,0 +1,87 @@
+## Get fasta sequence from a pdb
+print cmd.get_fastastr('all')
+
+## Select residues based on number
+select hypho, resi 54+68+77+81+158+159+173+175+185+205+206+207+208+209+224+229+234+236+237+244+248+267+268+270+271+279+281+283+284+288+289
+
+## Change name of an object
+set_name <oldName>, <newName>
+
+set ray_opaque_background, off
+
+set cartoon_fancy_helices, 1
+set cartoon_side_chain_helper, on
+set cartoon_transparency, 0.8
+set cartoon_color, wheat
+set sphere_scale, 0.5
+
+set cartoon_oval_length , 0.8
+set cartoon_oval_width , 0.2
+
+
+bg_color white
+
+#set cartoon_color, red, <object>
+#set cartoon_transparency, 0.5, <object>
+
+select zn, resn zn
+show sticks, zn 
+
+## Add bond
+bond resi 234 and resn GLU and name CA, resi 259 and resn SER and name CA
+## Change color of bond
+set_bond line_color, red, resi 234 and resn GLU and name CA, resi 259 and resn SER and name CA
+
+## Add interaction line (yellow dashed)
+dist line1, A/97/OE1, A/909/MN
+hide labels
+
+## Altering residue numbering
+alter gt_domain, resi=str(int(resi)-144)
+sort
+###############
+
+align target, template
+align 1h7q, 2z86_CHS
+
+##############
+## Label specific residues
+label n. ca and i. 5, "%s%s" %(one_letter[resn],resi)
+label n. ca and i. 25, "%s%s" %(one_letter[resn],resi)
+label n. ca and i. 29, "%s%s" %(one_letter[resn],resi)
+label n. ca and i. 92, "%s%s" %(one_letter[resn],resi)
+label n. ca and i. 94, "%s%s" %(one_letter[resn],resi)
+label n. ca and i. 99, "%s%s" %(one_letter[resn],resi)
+label n. ca and i. 102, "%s%s" %(one_letter[resn],resi)
+label n. ca and i. 120, "%s%s" %(one_letter[resn],resi)
+label n. ca and i. 196, "%s%s" %(one_letter[resn],resi)
+label n. ca and i. 202, "%s%s" %(one_letter[resn],resi)
+label n. ca and i. 203, "%s%s" %(one_letter[resn],resi)
+label n. ca and i. 205, "%s%s" %(one_letter[resn],resi)
+label n. ca and i. 218, "%s%s" %(one_letter[resn],resi)
+label n. ca and i. 219, "%s%s" %(one_letter[resn],resi)
+label n. ca and i. 222, "%s%s" %(one_letter[resn],resi)
+label n. ca and i. 223, "%s%s" %(one_letter[resn],resi)
+
+label n. c1 and i. 702, "GalNAc"
+################
+
+## manually adjust labels
+Click on Mouse mode to go to Editing mode
+Ctrl + Left Click and drag labels 
+################
+
+set label_font_id, 8
+set label_size, 14
+
+set float_labels, on
+set label_color, black
+
+set label_position, (0, 0, 20)
+
+ray 2400, 2400
+
+## Save image
+order *,yes
+order R_*, yes
+order 1frg, location=top

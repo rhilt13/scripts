@@ -1,0 +1,47 @@
+set ray_opaque_background, off
+set cartoon_fancy_helices, 1
+set cartoon_side_chain_helper, on
+set cartoon_transparency, 0.65
+set cartoon_color, wheat
+set sphere_scale, 0.5
+
+
+## Altering residue numbering
+alter gt_domain, resi=str(int(resi)-144)
+sort
+###############
+
+## Label specific residues
+label n. ca and i. 5, "%s%s" %(one_letter[resn],resi)
+label n. ca and i. 25, "%s%s" %(one_letter[resn],resi)
+label n. ca and i. 29, "%s%s" %(one_letter[resn],resi)
+label n. ca and i. 92, "%s%s" %(one_letter[resn],resi)
+label n. ca and i. 94, "%s%s" %(one_letter[resn],resi)
+label n. ca and i. 99, "%s%s" %(one_letter[resn],resi)
+label n. ca and i. 102, "%s%s" %(one_letter[resn],resi)
+label n. ca and i. 120, "%s%s" %(one_letter[resn],resi)
+label n. ca and i. 196, "%s%s" %(one_letter[resn],resi)
+label n. ca and i. 202, "%s%s" %(one_letter[resn],resi)
+label n. ca and i. 203, "%s%s" %(one_letter[resn],resi)
+label n. ca and i. 205, "%s%s" %(one_letter[resn],resi)
+label n. ca and i. 218, "%s%s" %(one_letter[resn],resi)
+label n. ca and i. 219, "%s%s" %(one_letter[resn],resi)
+label n. ca and i. 222, "%s%s" %(one_letter[resn],resi)
+label n. ca and i. 223, "%s%s" %(one_letter[resn],resi)
+
+label n. c1 and i. 702, "GalNAc"
+################
+
+set label_font_id, 8
+set label_size, 14
+
+## manually adjust labels
+Click on Mouse mode to go to Editing mode
+Ctrl + Left Click and drag labels 
+################
+
+set label_color, black
+
+ray 2400, 2400
+
+## Save image
