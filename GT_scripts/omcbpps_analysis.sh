@@ -9,13 +9,13 @@
 ######################################################
 ## Input:
 ## $1 = _new.mma file with the mma
-## $2 = Full path to rungaps output pdb_seqres.faa_aln.cma file for the pdb database 
-#		(../rungaps_*/pdb/pdb_seqres.faa_aln.cma)
+## $2 = absolute Full path to rungaps output pdb_seqres.faa_aln.cma file for the pdb database 
+#		(~/GT/gta_revise*/rungaps_*/pdb/pdb_seqres.faa_aln.cma)
 ## $3 = specify method 
 ##		1 if sequence ID has family info
 ##		2 if need to run rungaps to get info
-## $4 = full path to the run_gaps profile (~/rhil_project/GT/gta_revise6/profile/gt_rev6)
-## $5 = order file (~/rhil_project/GT/gta_revise6/profile/order)
+## $4 = absolute full path to the run_gaps profile (~/rhil_project/GT/gta_revise6/profile/gt_rev6)
+## $5 = absolute path to order file (~/rhil_project/GT/gta_revise6/profile/order)
 ######################################################
 ## Output:
 ## Generates a sets folder that has all files.
@@ -77,7 +77,7 @@ if [ $3 -eq 2 ]; then
 fi
 
 cd ..
-map_pdb_afteromcBPPS.sh $file_short $2
+# map_pdb_afteromcBPPS.sh $file_short $2
 
-less sets/hits_details|cut -f2 -d'|'|cut -f1 -d' '|sed 's/^Set/~/g'|tr '\n' ' '|tr '~' '\n' > map_fam_info
-less map_fam_info |perl -e 'while(<>){@a=split(/ /,$_);$hash{$a[0]}=$a[1];}open(IN,"map_pdb_table");while(<IN>){chomp;($num)=($_=~/Set([0-9]+)/);print "$hash{$num}\t$_\n";}' > map_pdb_table_details
+# less sets/hits_details|cut -f2 -d'|'|cut -f1 -d' '|sed 's/^Set/~/g'|tr '\n' ' '|tr '~' '\n' > map_fam_info
+# less map_fam_info |perl -e 'while(<>){@a=split(/ /,$_);$hash{$a[0]}=$a[1];}open(IN,"map_pdb_table");while(<IN>){chomp;($num)=($_=~/Set([0-9]+)/);print "$hash{$num}\t$_\n";}' > map_pdb_table_details

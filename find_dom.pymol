@@ -1,0 +1,34 @@
+cd ~/GT/gta_revise9/analysis/GT2_27_81/pdb;
+export PYTHONPATH=$PYTHONPATH:~/git/scripts;pymol all_align1.pse
+
+###########
+import findseq
+findseq VIMTSY.*DLNYIT, 1qgq, selName=1qgqGT
+create 1qgqGT, (1qgqGT);delete 1qgqGT;remove /1qgqGT//B
+findseq VIMTSY.*DLNYIT, 1h7l, selName=1h7lGT
+create 1h7lGT, (1h7lGT);delete 1h7lGT;remove /1h7lGT//B
+findseq IVVPTR.*PVLYPP, 2wvl, selName=2wvlGT
+create 2wvlGT, (2wvlGT);delete 2wvlGT;remove /2wvlGT//B
+findseq IYIPAY.*HGENTS, 2z86, selName=2z86GT
+create 2z86GT, (2z86GT);delete 2z86GT;remove /2z86GT//B
+findseq IVIPMY.*KGLFAW, 5eke, selName=5ekeGT
+create 5ekeGT, (5ekeGT);delete 5ekeGT;remove /5ekeGT//B
+findseq VVIVFH.*FYIISP, 1xhb, selName=1xhbGT
+create 1xhbGT, (1xhbGT);delete 1xhbGT;remove /1xhbGT//B
+findseq IIIPFH.*IYQRRP, 2d7r, selName=2d7rGT
+create 2d7rGT, (2d7rGT);delete 2d7rGT;remove /2d7rGT//B
+findseq VVITFH.*YYAAVP, 5ajp, selName=5ajpGT
+create 5ajpGT, (5ajpGT);delete 5ajpGT;remove /5ajpGT//B
+findseq VVLPAL.*QHTWPV, 3ckn, selName=3cknGT
+create 3cknGT, (3cknGT);delete 3cknGT;remove /3cknGT//B
+findseq VIVPMK.*PLVMRP, 2zu8, selName=2zu8GT
+create 2zu8GT, (2zu8GT);delete 2zu8GT;remove /2zu8GT//B
+findseq VLPSRN.*GRLQQL, 3o3p, selName=3o3pGT
+create 3o3pGT, (3o3pGT);delete 3o3pGT;remove /3o3pGT//B
+findseq VVLPAL.*RHTWPV, 4dec, selName=4decGT
+create 4decGT, (4decGT);delete 4decGT;remove /4decGT//B
+
+
+## Grouping
+group 1qgqGrp, 1qgq 1qgqGT 1qgqS2 1qgq_cont1 1qgq_res 1qgq_subs 1qgq_set2_sel
+group 1xhbGrp, 1xhb 1xhbGT 1xhbS2 1xhb_cont1 1xhb_res 1xhb_subs 1xhb_set2_sel

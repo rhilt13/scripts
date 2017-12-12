@@ -7,7 +7,7 @@ while($seq=$new->next_seq){
 	$i=$seq->id;
 	$d=$seq->desc;
 	$s=$seq->seq;
-	if ($i=~m/^GT74-/){
+	if ($i!~m/MULTISPECIES/){
 		print ">$i $d\n$s\n";
 	}
 }

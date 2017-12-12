@@ -327,7 +327,8 @@ hieraln <new_prefix>
 
 ###########################################################
 
-## Running rungaps on nr database and concatenating the results
+## Written as rungaps_nr.sh
+## Running rungaps on nr database and concatenating the results (nr_rungaps)
 ## First run rungaps submitting a job with the command as follows:
 ## Sample in /home/nknlab/rt33095/GT/rt33095_Mar_18/qsub_rev4/qsub_rungaps_rev4_nr.sh
 
@@ -344,9 +345,17 @@ cd <target_dir>/nr/run_gaps/
 # cp part/*aln*.cma .
 get head and tail -- copy from somewhere # check /home/nknlab/rt33095/GT/rt33095_Mar_18/cazy_pdb_revise4/non-gt2/nr/run_gaps
 # Change number of seq to "numnumseq" in head
-
+less part/nr.part-01.hits|grep '^=='|cut -f3,4 -d' '|sed 's/: /\t/g' > map_fam_info
 for i in `ls part/nrtx.part*aln.cma`; do cat $i|sed '1,2d'|head -n -2 >> nr_<filesp>; done
 ## Adding head and tail in step below
+
+## Separate out sets of hits
+mkdir sets
+for i in `ls part/nrtx.part-*[0-9].cma`; do j=$(echo $i|rev|cut -f1 -d'_'|rev|cut -f1 -d'.');cat $i|sed '1,7d'|head -n -2 >> sets/nr_gtrev8_$j; done
+cd sets;
+for i in `ls *`; do j=$(cnt $i|sed 's/^\s\+//g'|cut -f1 -d' ');cat ../head $i ../tail|sed "s|numnumseq|$j|" >$i.cma ; done
+
+#### 
 
 ## To get nongt2 hits from nr rungaps
 ## decide pattern of part file numbering using fam_num_list file from rungaps folder to get all nongt2 families
@@ -358,10 +367,6 @@ for i in `ls part/nrtx.part*_[3-5][0-9].cma`; do cat $i|sed '1,7d'|head -n -2 >>
 ## Join head and tail
 for i in `ls nr_*`; do j=$(cnt $i|sed 's/^\s\+//g'|cut -f1 -d' ');cat ../head $i ../tail|sed "s|numnumseq|$j|" >$i.cma ; done
 
-## Separate out sets of hits
-mkdir sets
-for i in `ls part/nrtx.part-*[0-9].cma`; do j=$(echo $i|rev|cut -f1 -d'_'|rev|cut -f1 -d'.');cat $i|sed '1,7d'|head -n -2 >> sets/nr_gtrev8_$j; done
-for i in `ls *`; do j=$(cnt $i|sed 's/^\s\+//g'|cut -f1 -d' ');cat ../head $i ../tail|sed "s|numnumseq|$j|" >$i.cma ; done
 
 ## Filter nr rungaps to get dataset to run omcBPPS on
 ## Get separate nongt2 and gt2 sets and filter separately
@@ -658,6 +663,9 @@ cat temp1|perl -e '$line=1;$ct=120;while(<>){print "$line\t$ct\t$_";if ($_!~/-/)
 ## Get IDs froma  newick tree
 cat gt8_prune1500.nwk |tr ',' '\n'|cut -f1 -d':'|sed 's/(//g'|grep '\.1\|\.2\|.3' > gt8_prune1500.nwk.ids
 
+#####################################################
+## Get weblogo from cma files
+## Written as bash script in weblogo.sh
 
 #####################################################
 # MD simulation
@@ -708,6 +716,9 @@ get-seq-bioperl_nochange2.pl scer_cazy_GT-A.ids scer_cazy_GT.fa.edit > scer_cazy
 ## Other manual way for above 2 steps
 grep -A1 -f ~/GT/CAZy_families/cazy_gta.famlist hum_cazy_GT_final.fa|grep -v '^--$' > hum_cazy_GT-A_final.fa
 # Manually remove other families caught by GT2,6,7,8
+
+############################################################
+cat list_hits.txt.details |head -1577|perl -lne '@a=split(/\t/,$_);if ($a[0]=~/\d/){$fam=$a[1];}else{print "$fam\t$a[1]"}' > list_hits.txt.details.map
 
 ############################################################
 ## Long term work

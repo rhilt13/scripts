@@ -14,7 +14,6 @@
 # Output:
 # Creates a pdb_map file containing .pml files for all mapped pdb structures.
 
-
 # To run:
 # map_pdb_afteromcBPPS.sh <file prefilx>			
 # <FILE PREFILX> = cazy_set2_new.mma without the _new.mma

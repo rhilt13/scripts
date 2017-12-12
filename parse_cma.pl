@@ -55,6 +55,7 @@ while(<IN>){
 		$_=~s/\s+$//g;
 		$_=~s/>//;
 		$seq_id{$id}=$_;
+		# print "##$id\t$seq_id{$id}\n";
 		$seq_id_back{$_}=$id;
 		$grp_num{$id}=$grp;
 	}elsif ($_=~/^\{/ || $_=~/^[A-Za-z]/){
@@ -96,14 +97,16 @@ if ($ARGV[1] eq 'sel'){
 	while(<IN2>){
   		chomp $_;
   		# print "%%%$_***\n";
-  		@a=split(/\|/,$_);
+  		# @a=split(/\|/,$_);
+  		# @a=split(/ /,$_);
   		# $id_hash{$a[2]}=$a[1];
   		# @a=split(/\./,$_);
   		# print "$a[0]\n";
-		# $id_hash{$_}=1;
-  		$id_hash{$a[1]}=$_;
+		$id_hash{$_}=1;
+		$id_hash{$_}=$_;
+  		# $id_hash{$a[0]}=$_;
 	}
-#	print Dumper(\%id_hash);
+	# print Dumper(\%id_hash);
 	foreach $id(sort { $a <=> $b } keys(%len)){
 		### If id needs to be split
 		# @a=split(/\|/,$seq_id{$id});
@@ -111,27 +114,29 @@ if ($ARGV[1] eq 'sel'){
 		# print "$a[1]\n";
 		# if (defined $id_hash{$a[1]} && (!(defined($print_hash{$seq_id{$id}})))){
 		$fin_id=$seq_id{$id};
-		# print "$fin_id\n";
+		# print "***$fin_id\n";
 		if ($fin_id=~/^GT/){	# Specific for CAZy idedit sequences
 			@a=split(/\|/,$fin_id);
-			$fin_id=$a[1];
+			$test_id=$a[1];
 		}else {
 			@b=split(/ /,$fin_id);
 			# print "$b[0]\n";
-			$fin_id=$b[0];
+			$test_id=$b[0];
 			# $id_hash{$fin_id}=1;
-			# print "$fin_id\n";
+			# print "===$fin_id\t$test_id\n";
 		}
 		# print "$fin_id\n";
 		# if (defined $id_hash{$seq_id{$id}}){	# IF NOT CARE ABOUT REDUNDANT
-		if (defined $id_hash{$fin_id} && (!(defined($print_hash{$fin_id})))){
+		# if (defined $id_hash{$fin_id} && (!(defined($print_hash{$fin_id})))){
+		if (defined $id_hash{$test_id} && (!(defined($print_hash{$fin_id})))){
 		# if (defined $id_hash{$b[0]}){
 			# print "$fin_id\n";
 			#$print_hash{$fin_id}=1;
 			$ct++;
 			$out .= "\$$ct=$len{$id}($prof{$id}):\n";
 			#$out .= ">$seq_id{$id}\n$seq{$id}\n\n";
-			$out .= ">$id_hash{$fin_id}\n$seq{$id}\n\n";
+			# $out .= ">$id_hash{$fin_id}\n$seq{$id}\n\n";
+			$out .= ">$fin_id\n$seq{$id}\n\n";
 		}#else{
 			### If need to control for length
 		# 	if ($len{$id} >=210 and $len{$id} < 600){

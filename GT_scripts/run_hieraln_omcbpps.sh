@@ -44,4 +44,6 @@ if [ $3 == "realign" ]; then
 else
 	hieraln $2
 fi
+
+run_map ${2}_himsa
 ## After running this, use run_hierview_omcbpps.sh
