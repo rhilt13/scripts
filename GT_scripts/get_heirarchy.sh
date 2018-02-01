@@ -668,6 +668,18 @@ cat gt8_prune1500.nwk |tr ',' '\n'|cut -f1 -d':'|sed 's/(//g'|grep '\.1\|\.2\|.3
 ## Written as bash script in weblogo.sh
 
 #####################################################
+## Run cross_rungaps for nr hits
+mkdir sets/cross_rungaps
+for i in `ls part/nrtx.part-*[0-9].seq`; do j=$(echo $i|rev|cut -f1 -d'_'|rev|cut -f1 -d'.');cat $i >> sets/cross_rungaps/nr_gtrev9_$j.seq; done
+cd sets/cross_rungaps
+for i in `ls`; do run_gaps ~/GT/gta_revise9/profile/gt_rev9 $i -O &>>$i.hits; done
+
+## Parse cross_rungaps output to find which sets hit which original profiles
+for i in `ls *.hits`; do cat $i|grep '^run_gaps \|^=='|perl -lne 'if ($_=~/^run_gaps/){($id)=($_=~/_([0-9]+).seq/);print $id;}else{print $_;}' >> hits_details; done
+cat hits_details |perl -e 'open(IN,"../fam_num_list");while(<IN>){chomp;@a=split(/\t/,$_);$hash{$a[0]}=$a[1];}while(<>){chomp;if ($_=~/^[0-9]/){print "$_\t$hash{$_}\n"}else{print "$_\n";}}' > hits_details_all
+
+
+#####################################################
 # MD simulation
 
 # To generate more refined pdb strucures with sec. str.
@@ -720,7 +732,12 @@ grep -A1 -f ~/GT/CAZy_families/cazy_gta.famlist hum_cazy_GT_final.fa|grep -v '^-
 ############################################################
 cat list_hits.txt.details |head -1577|perl -lne '@a=split(/\t/,$_);if ($a[0]=~/\d/){$fam=$a[1];}else{print "$fam\t$a[1]"}' > list_hits.txt.details.map
 
+## Get pseudoGTs
+unmatchcma CAZy_allGT_genbank.faa.IDedit_aln.cma DEQN86,DENQH88
 ############################################################
+##Change names for the newly identified GT-A families
+sed -i 's/GT16-u|/GT16-A|/g;s/GT31-u|/GT31-A|/g;s/GT60-u|/GT60-A|/g;s/GT32-u|/GT32-A|/g' CAZy_allGT_genbank.faa.IDedit
+
 ## Long term work
 ## Update everything associated with CAZy 
 ## 1) CAZy pages

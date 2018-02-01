@@ -45,22 +45,21 @@ align target, template
 align 1h7q, 2z86_CHS
 
 ##############
+## Align 2 structures
+super mover_id target_id
+align mover_id target_id
+cealign target_id mover_id
+
+##############
+## Mover structures around manually
+Go to editing mode
+Shift + Left click 
+Shift + Middle click
+ 
+##############
 ## Label specific residues
 label n. ca and i. 5, "%s%s" %(one_letter[resn],resi)
 label n. ca and i. 25, "%s%s" %(one_letter[resn],resi)
-label n. ca and i. 29, "%s%s" %(one_letter[resn],resi)
-label n. ca and i. 92, "%s%s" %(one_letter[resn],resi)
-label n. ca and i. 94, "%s%s" %(one_letter[resn],resi)
-label n. ca and i. 99, "%s%s" %(one_letter[resn],resi)
-label n. ca and i. 102, "%s%s" %(one_letter[resn],resi)
-label n. ca and i. 120, "%s%s" %(one_letter[resn],resi)
-label n. ca and i. 196, "%s%s" %(one_letter[resn],resi)
-label n. ca and i. 202, "%s%s" %(one_letter[resn],resi)
-label n. ca and i. 203, "%s%s" %(one_letter[resn],resi)
-label n. ca and i. 205, "%s%s" %(one_letter[resn],resi)
-label n. ca and i. 218, "%s%s" %(one_letter[resn],resi)
-label n. ca and i. 219, "%s%s" %(one_letter[resn],resi)
-label n. ca and i. 222, "%s%s" %(one_letter[resn],resi)
 label n. ca and i. 223, "%s%s" %(one_letter[resn],resi)
 
 label n. c1 and i. 702, "GalNAc"
