@@ -734,6 +734,123 @@ cat list_hits.txt.details |head -1577|perl -lne '@a=split(/\t/,$_);if ($a[0]=~/\
 
 ## Get pseudoGTs
 unmatchcma CAZy_allGT_genbank.faa.IDedit_aln.cma DEQN86,DENQH88
+
+############################################################
+## mcBPPS workflow starting from a tree and cma file
+
+## To run tree2hpt
+## Export tree from itol to get bootstraps into square brackets
+less altree.txt |sed 's/\[[0-9]\+\]//g;s/[-.]//g' > altree.e1.txt
+add_prefixnum.py altree.e1.txt altree.e2.txt
+tree2hpt altree.e2.txt > nrrev9_sel1.hpt
+# remove the space between the number and sequence id in hpt file using vi (Ctrl+V, select column and del)
+####
+
+### New replace above steps After exporting tree from itol
+# Remove bootstraps
+less tree1.txt |sed 's/\[[0-9.]\+\]//g' > tree1.e1.txt
+# remove special characters from ids and add internal nodes
+add_prefixnum.py tree1.e1.txt tree1.e2.txt
+
+
+# View tree to find root, get name for root internal node (if needed)
+prune_tree.py tree1.e2.txt|less
+# If I9 is the internal node name, run following to do rooting
+prune_tree.py tree1.e2.txt I9|less
+
+# get node labels within each node after root is determined
+get_nodes.py tree1.e2.txt I9 > tree1.e2.txt.nodes
+
+# Visualize the tree and copy paste internal node names you want to make tips into file tree1.e2.txt.collapse_list
+nano tree1.e2.txt.collapse_list
+# Run following ommand iteratively to apply pruning to selected nodes
+prune_tree.py tree1.e2.txt I9 tree1.e2.txt.collapse_list|less
+# Once all nodes are selected and appropriate rooting achieved, get pruned tree
+prune_tree.py tree1.e2.txt I9 tree1.e2.txt.collapse_list tree1.e2.txt.col tree1.e2.txt.col.nodes|less
+# Add prefix numbers to all nodes (required for tree2hpt)
+add_prefixnum.py tree1.e2.txt.col tree1.e2.txt.col2 addnum
+# Add family names to tips manually (edit2tab separate)
+cp tree1.e2.txt.collapse_list tree1.e2.txt.collapse_list.details
+nano tree1.e2.txt.collapse_list.details
+prune_tree.py tree1.e2.txt I9 # To help identify nodes
+# Edit tip names in tree
+edit_nwk_ID.pl tree1.e2.txt.collapse_list.details tree1.e2.txt.col2 > tree1.e2.txt.col3
+# Run tree2hpt
+tree2hpt tree1.e2.txt.col3 > tree1.e2.txt.col3.hpt
+
+# Get .selID files for each level and node in tree tree1.e2.txt.col
+# Creates folder sub_cma and writes files for each node inside it
+# This step may be included inside build_sma.sh
+# Following script replaces get-cma-seq.pl
+list_leafIDs.fix.pl tree1.e2.txt.collapse_list.details tree1.e2.txt.nodes tree1.e2.txt.col.nodes
+cd sub_cma
+# Options to run are inside the script
+# The options will change depending on filenames and run
+build_sma.sh ../gt31_tc_sel2.id2.cma nrtx.part-01
+
+# Get sma file in the order of hpt file
+for i in `cat ../tree1.e2.txt.col3.hpt|cut -f3 -d' '|sed '1,2d;$ d;s/.$//'`; do cat $i.cons.edit.cma ; done >allcons.sma
+cp allcons.sma ../../gt31_tc.sma 
+
+# Replaced by command above...concatenate .cons.edit.cma files in the order of hpt file
+#for i in `cat ../tree1.e2.txt.col3.hpt|cut -f3 -d' '|sed '1,2d;$ d;s/.$//'`; do cat ${i}_*.cons.edit.cma >> allcons.sma; done
+#Get map for matching family level IDs with the ids on hpt file
+#for i in `cat ../tree1.e2.txt.col3.hpt|cut -f3 -d' '|sed '1,2d;$ d;s/.$//'`; do j=$(echo ${i}_*.cons.edit.cma|sed 's/.cons.edit.cma//');echo $i $j; done > ../tree1.e2.txt.col3.hpt.name_map
+
+# Go to the aln folder outside sub_cma
+cd ..
+# Get edited hpt file
+cat tree1.e2.txt.col3.hpt|rev|sed 's/ //'|rev > ../gt31_tc.hpt
+
+
+#cat tree1.e2.txt.col3.hpt|perl -e 'open(IN,"tree1.e2.txt.col3.hpt.name_map");while(<IN>){chomp;@a=split(/ /,$_);$hash{$a[0]}=$a[1];}while(<>){chomp;@b=split(/ /,$_);($sym)=($b[2]=~/(.)$/);$b[2]=~s/.$//;if (exists $hash{$b[2]}){print "$b[0] $b[1]","$hash{$b[2]}","$sym\n";}else{print "$b[0] $b[1]","$b[2]","$sym\n";}}' > ../gt31_tc.hpt
+
+
+## Edit cma file to match the ids in tree
+cat sel3.id2.cma |perl -lne 'if ($_=~/^>/){$_=~s/[.-]//g;print $_;}else{print $_;}' > sel3.id2.e1.cma
+
+
+edit_nwk_ID.pl tree1.edit2.txt.label tree1.edit2.txt > tree1.edit3.txt
+## Get sma file using hpt and edited cma file
+build_sma.sh 
+
+############################################################
+## Parse PISA information
+## Copy pasate xml files from PISA output to a file interface.*.xml
+cat interface.a_d.xml |perl -e 'while(<>){@m=($_=~/>(.*?)</g);foreach $var(@m){if ($var=~/^\s+[A-D]/){print "\n";}if ($var!~/^$/){$var=~s/\s//g;print "$var\t";}}}'|sed '1d' > interface.a_d.tab
+
+############################################################
+## Compare 2 cma files with same seq ids to see which one has better hits
+parse_cma.pl file_1.cma list|cut -f2 -d'|' > old
+parse_cma.pl file_2.cma list|cut -f2 -d'|' > new
+
+cat new|perl -e 'open(IN,"old");while(<IN>){chomp;@a=split(/\t/,$_);$hash{$a[0]}=$a[1];}while(<>){chomp;@b=split(/\t/,$_);print "$b[0]\t$hash{$b[0]}\t$b[1]\n";}' > list_diff
+## Change $2 and $3 in awk based on which one you want to select for
+cat list_diff|awk '{if ($2>$3){print $0,"\t",$2-$3}}'|sort -k4,4nr|less
+
+############################################################
+## Parse PSI-BLAST output
+# Run PSI-BLAST and copy paste following results:
+# file.txt = selected sequences for making PSSM
+
+# Once no new sequences are found or false hits are found,
+# file.txt
+# file.fa (Multiple sequence alginment > Download > fasta with gaps)
+# file.tax (Taxonomy Reports > Select tax tree Copy paste)
+# file.hits (Taxonomy Reports > Selct list of hits Copy paste)
+
+less cosmc_PSI2.hits|grep -v 'Next Previous'|grep -v '\]$'|grep -v RecName|cut -f4 > cosmc_hits.ids
+
+############################################################
+## Caluclate conservation scores for aligned postions and parse output
+
+# Get conservation scores from alignment
+score_conservation.py -a Human_COSMC -o cosmc_mc_psi.p99.fa_js_win3 -m ~/tools/conservation_code/matrix/blosum62.bla cosmc_mc_psi.p99.fa
+# Get aligned position counts in the alignment
+perl ~/git/scripts/get-pos-num.pl cosmc_mc_psi.p99.fa > cosmc_mc_psi.p99.fa.pos_map
+# Get interface residues ( or other regions of the protein if required)
+
+
 ############################################################
 ##Change names for the newly identified GT-A families
 sed -i 's/GT16-u|/GT16-A|/g;s/GT31-u|/GT31-A|/g;s/GT60-u|/GT60-A|/g;s/GT32-u|/GT32-A|/g' CAZy_allGT_genbank.faa.IDedit

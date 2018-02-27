@@ -26,7 +26,7 @@ $new=Bio::SeqIO->new(-file=>$ARGV[1], -format=>"fasta");
 
 while($seq=$new->next_seq){
   $i=$seq->id;
-  # $i=~s/\.[0-9]$//g;
+  $i=~s/\.[0-9]+$//g;
   # print $i;
   # $i=~s/[A-Z]$//;
   #@b=split(/\|/,$i);

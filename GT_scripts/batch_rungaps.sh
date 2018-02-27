@@ -29,7 +29,7 @@ done
 
 find . -name *_aln.cma > filenames
 parse_cma.pl main_hits.cma compare list filenames >${2}_final.cma
-parse_cma.pl main_hits.cma len >${2}_final.l140.cma
+parse_cma.pl main_hits.cma len 140 600 >${2}_final.l140.cma
 # cat ${2}_main_hits ${2}_added_hits > ${2}_final_hits
 
-rm main_hits.cma filenames
+# rm main_hits.cma filenames

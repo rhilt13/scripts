@@ -1,16 +1,25 @@
 #!/usr/bin/env python2.7
 from Bio import Phylo
-
+import re
 def add_num(tree):
     import string, random
     def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
         return ''.join(random.choice(chars) for x in range(size))
     i = 0
+    j = 0
     for clade in tree.find_clades():
         if clade.name is not None:
-            clade.name = str(i) + '_' + clade.name
+            n=re.sub(r'[^\w]', '', clade.name)
+            if len(sys.argv) > 3:
+                clade.name = str(i) + '_' + n
+            else:
+                clade.name = n
         else:
-            clade.name = str(i) + '_' + id_generator()
+            if len(sys.argv) > 3:
+                clade.name = str(i) + '_' + "I" + str(j)
+            else:
+                clade.name = "I" + str(j)
+            j+=1
         i += 1
     return tree
 

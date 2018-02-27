@@ -16,7 +16,9 @@ use Data::Dumper;
 #				$ARGV[2]=minimum length; $ARGV[3]=maximum length
 #				$search for line with /change length/ and change min and max length
 #	=	sel 	:print selected sequences
-#				$ARGV[2] = input list of seq id (no >)
+#				$ARGV[2] = input list of seq id (no >) (matches full ID)
+#				$ARGV[3] (optional) = 'genbank' ; if match only Genbank id aprt of seq id in 
+#								2nd col separated by | (eg: GT31|AAQ31451|H.sapiens)
 #	=	sel-man	:print selected sequences with manual selections
 #				$ARGV[2] = input pattern to match
 #				$ search for line with /match unmatch/ and change regex
@@ -36,6 +38,8 @@ use Data::Dumper;
 #				 $ARGV[2,3,4....] = cma filenames
 #				 $ARGV[2] =list
 #					$ARGV[3] = filename with list of cma files to compare
+#	=	list	:list aligned position length of each seqence in cma file
+#				 $ARGV[2]=cma file - list lengths of sequences matching previous cma file alongside
 
 # Example run:
 # perl ~/rhil_project/scripts/parse_cma.pl d102.d104_not.cma unsel tempb
@@ -59,13 +63,18 @@ while(<IN>){
 		$_=~s/^\s+//g;
 		$_=~s/\s+$//g;
 		$_=~s/>//;
+		@a=split(/ /,$_);
+		$main_id=shift @a;
+		$desc_id=join ' ',@a;
 		if (exists $seq_id_back{$_}){
 			$dup_seq_id{$id}=$_;
 			$dup_seq_id_back{$_}=$id;
 		}else{
 			$seq_id_back{$_}=$id;
 		}
-		$seq_id{$id}=$_;
+		# $seq_id{$id}=$_;
+		$seq_id{$id}=$main_id;
+		$desc_hash{$id}=$desc_id;
 		# print "##$id\t$seq_id{$id}\n";
 		$grp_num{$id}=$grp;
 	}elsif ($_=~/^\{/ || $_=~/^[A-Za-z]/){
@@ -158,16 +167,18 @@ if ($ARGV[1] eq 'sel'){
 		# if (defined $id_hash{$a[1]} && (!(defined($print_hash{$seq_id{$id}})))){
 		$fin_id=$seq_id{$id};
 		# print "***$fin_id\n";
-		# if ($fin_id=~/^GT/){	# Specific for CAZy idedit sequences
-		# 	@a=split(/\|/,$fin_id);
-		# 	$test_id=$a[1];
-		# }else {
+		if (exists ($ARGV[3])){
+			if ($ARGV[3] eq 'genbank'){	# Specific for CAZy idedit sequences
+				@a=split(/\|/,$fin_id);
+				$test_id=$a[1];
+			}
+		}else {
 			@b=split(/ /,$fin_id);
 			# print "$b[0]\n";
 			$test_id=$b[0];
 			# $id_hash{$fin_id}=1;
 			# print "===$fin_id\t$test_id\n";
-		# }
+		}
 		# print "$fin_id\n";
 		# if (defined $id_hash{$seq_id{$id}}){	# IF NOT CARE ABOUT REDUNDANT
 		# if (defined $id_hash{$fin_id} && (!(defined($print_hash{$fin_id})))){
@@ -253,7 +264,7 @@ if ($ARGV[1] eq 'unsel'){
 			$ct++;
 			$print_hash{$seq_id{$id}}=1;
 			$out .= "\$$ct=$len{$id}($prof_len):\n";
-			$out .= ">$seq_id{$id}\n$direct_seq{$seq_id{$id}}\n\n";
+			$out .= ">$seq_id{$id} $desc_hash{$id}\n$direct_seq{$seq_id{$id}}\n\n";
 		}#else{
 			## If need to control for length of sequences
 		# 	if ($len{$id} >=210 and $len{$id} < 600){
@@ -316,7 +327,7 @@ if ($ARGV[1] eq 'len'){
 			if ($len{$id} >= $ARGV[2] and $len{$id} < $ARGV[3]){		# change length
 				$ct++;
 				$out .= "\$$ct=$len{$id}($prof_len):\n";
-				$out .= ">$seq_id{$id}\n$seq{$id}\n\n";
+				$out .= ">$seq_id{$id} $desc_hash{$id}\n$seq{$id}\n\n";
 			}
 		}
 	}
@@ -529,3 +540,10 @@ if ($ARGV[1] eq 'compare'){
 	print "$sep3\n";
 }
 
+########## End Compare ###################################
+
+if ($ARGV[1] eq 'list'){
+	foreach $id(sort { $a <=> $b } keys(%len)){
+		print "$seq_id{$id}\t$aligned_ct{$id}\n";
+	}
+}
