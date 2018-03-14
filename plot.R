@@ -9,20 +9,23 @@ for (i in 1:length(args)){
 	# g_range<-range(0,table[4])
 	# ls()
 	# print(dim(table))
+	colnames(t) <- c("res","aln_pos","3let","pos","cons","asa","bsa","bsa_score","type1","type") 
+	# colnames(t) <- c("aln_pos","res","cons","type") 
 	print(names(t))
 	# print(names(d))
 	# print(table[3])
 	# plot(table[3], type="o", col="blue", ylim=g_range, axes="FALSE", ann="FALSE")
-	# boxplot(V3~V4,data=table, main="Conservation",xlab="Res",ylab="ConservationScore")
-	t$V4 <-factor(t$V4)
+	boxplot(cons~type1,data=t, main="Conservation",xlab="Res",ylab="ConservationScore")
+	boxplot(cons~type,data=t, main="Conservation",xlab="Res",ylab="ConservationScore")
+	t$type <-factor(t$type)
 	print(levels(t$V4)[1])
 	# print(levels(d$V4))
-	tBI <- t[t$V4 == "Buried" | t$V4 == "Interface", ]
-	tBS <- t[t$V4 == "Buried" | t$V4 == "Surface", ]
-	tSI <- t[t$V4 == "Surface" | t$V4 == "Interface", ]
-	tBIres <- t.test(tBI$V3~tBI$V4)
-	tBSres <- t.test(tBS$V3~tBS$V4)
-	tSIres <- t.test(tSI$V3~tSI$V4)
+	tBI <- t[t$type == "Buried" | t$type == "Interface", ]
+	tBS <- t[t$type == "Buried" | t$type == "Surface", ]
+	tSI <- t[t$type == "Surface" | t$type == "Interface", ]
+	tBIres <- t.test(tBI$cons~tBI$type)
+	tBSres <- t.test(tBS$cons~tBS$type)
+	tSIres <- t.test(tSI$cons~tSI$type)
 	print(tBIres)
 	print(tBSres)
 	print(tSIres)

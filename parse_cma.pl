@@ -249,6 +249,8 @@ if ($ARGV[1] eq 'unsel'){
 	open(IN2,$ARGV[2]);
 	while(<IN2>){
   		chomp $_;
+  		$_=~s/^\s+//;
+  		$_=~s/\s+$//;
   		## If need to split id
   		# @a=split(/\t/,$_);
   		# $id_hash{$a[2]}=$a[1];

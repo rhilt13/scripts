@@ -738,20 +738,19 @@ unmatchcma CAZy_allGT_genbank.faa.IDedit_aln.cma DEQN86,DENQH88
 ############################################################
 ## mcBPPS workflow starting from a tree and cma file
 
-## To run tree2hpt
-## Export tree from itol to get bootstraps into square brackets
-less altree.txt |sed 's/\[[0-9]\+\]//g;s/[-.]//g' > altree.e1.txt
-add_prefixnum.py altree.e1.txt altree.e2.txt
-tree2hpt altree.e2.txt > nrrev9_sel1.hpt
+## Old method To run tree2hpt #######################################
+## Export tree from itol to get bootstraps into square brackets		#
+# less altree.txt |sed 's/\[[0-9]\+\]//g;s/[-.]//g' > altree.e1.txt #
+# add_prefixnum.py altree.e1.txt altree.e2.txt 						#
+# tree2hpt altree.e2.txt > nrrev9_sel1.hpt 							#
 # remove the space between the number and sequence id in hpt file using vi (Ctrl+V, select column and del)
-####
+#####################################################################
 
 ### New replace above steps After exporting tree from itol
 # Remove bootstraps
 less tree1.txt |sed 's/\[[0-9.]\+\]//g' > tree1.e1.txt
 # remove special characters from ids and add internal nodes
 add_prefixnum.py tree1.e1.txt tree1.e2.txt
-
 
 # View tree to find root, get name for root internal node (if needed)
 prune_tree.py tree1.e2.txt|less
@@ -763,10 +762,14 @@ get_nodes.py tree1.e2.txt I9 > tree1.e2.txt.nodes
 
 # Visualize the tree and copy paste internal node names you want to make tips into file tree1.e2.txt.collapse_list
 nano tree1.e2.txt.collapse_list
-# Run following ommand iteratively to apply pruning to selected nodes
-prune_tree.py tree1.e2.txt I9 tree1.e2.txt.collapse_list|less
+# Copy paste solitary leaves that do not belong inside selected internal nodes you want to remove
+nano tree1.e2.txt.remove_leaves
+# Remove leaves that are singly isolated
+prune_tree.py tree1.e2.txt I9 tree1.e2.txt.remove_leaves|less
+# Run following command iteratively to apply pruning to selected nodes
+prune_tree.py tree1.e2.txt I9 tree1.e2.txt.remove_leaves tree1.e2.txt.collapse_list|less
 # Once all nodes are selected and appropriate rooting achieved, get pruned tree
-prune_tree.py tree1.e2.txt I9 tree1.e2.txt.collapse_list tree1.e2.txt.col tree1.e2.txt.col.nodes|less
+prune_tree.py tree1.e2.txt I9 tree1.e2.txt.remove_leaves tree1.e2.txt.collapse_list tree1.e2.txt.col tree1.e2.txt.col.nodes|less
 # Add prefix numbers to all nodes (required for tree2hpt)
 add_prefixnum.py tree1.e2.txt.col tree1.e2.txt.col2 addnum
 # Add family names to tips manually (edit2tab separate)

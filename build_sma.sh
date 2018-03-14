@@ -10,7 +10,6 @@
 # *_l${j}.selID
 # $1 - ../hum_gta.e1.cma
 # $2 - sel3
-# $3 - {2..$3}
 # 
 
 ### First steps
