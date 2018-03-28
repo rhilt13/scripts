@@ -6,12 +6,12 @@ import csv
 import sys
 import os.path
 
-# argv[1] - newick tree file
+# argv[1] - newick tree file 			*
 # argv[2] - outgroup
-# argv[3] - list of leaves to remove
-# argv[4] - list of clade ids to prune
-# argv[5] - output tree filename
-# argv[6] - output for hierarchy of nodes
+# argv[3] - list of leaves to remove 	*.remove_leaves
+# argv[4] - list of clade ids to prune	*.collapse_list
+# argv[5] - output tree filename 		*.col 
+# argv[6] - output for hierarchy of nodes 	*.col.nodes
 
 def collapsed_leaf(node):
 		if len(node2labels[node]) == 1:
@@ -24,8 +24,6 @@ for line in f:
 	t = Tree(line, format=1)
 # print t
 # print t.get_ascii(show_internal=True)
-
-
 
 if len(sys.argv) > 2:
 	if sys.argv[2] in t:
@@ -51,6 +49,16 @@ if len(sys.argv) > 3:
 		# print len(keep_leaves)
 		t.prune(keep_leaves)
 # print t1.get_ascii(show_internal=True)
+
+#########################################
+## If wish to remove internal nodes to change levels
+remove_nodes=['I8','I9','I10','I12','I44','I45','I46']
+# print remove_nodes
+for n in t.traverse():
+	if n.name in remove_nodes:
+		J = t.search_nodes(name=n.name)[0]
+		J.delete()
+#########################################
 
 if len(sys.argv) > 4:
 	ids=list()

@@ -44,6 +44,9 @@ name=$1;
 export name;
 cat pdb_list.mapped|perl -e 'while(<>){chomp;if ($_=~/^[0-9]+$/){$i=$_;$j=0;}else{$j++;system("chn_vsi $ENV{name}_pdb.VSI $j $i -T -skip=W -d2.5 -v -D -pml > $_.pml");}}'
 
-less ${1}_pdb.VSI|grep '^File\|Set'|grep -v 'Set1:'|cut -f2 -d'/'|cut -f1 -d'_'|uniq|tr '\n' ' '|tr ':' '\n'|awk -F "#" '{print $2,$1}'|sort -n > ../map_pdb_table
+less ${1}_pdb.VSI|grep '^File\|Set\|Group'|grep -v 'Set1:'|cut -f2 -d'/'|cut -f1 -d'_'|uniq|tr '\n' ' '|tr ':' '\n'|awk -F "#" '{print $2,$1}'|sort -n > ../map_pdb_table
+
+for i in `ls *pml`; do less $i|grep -v '^#'|grep 'load(\|cmd.color("bb_color1"\|create("Class_'|perl -e 'while(<>){chomp;if ($_=~/^cmd.load/){($id)=($_=~/\(\"\.\/([0-9a-zA-Z]+)/);print "\n$id";}elsif ($_=~/^cmd.color/){($num)=($_=~/resi ([0-9-]+) /);print "\t$num";}elsif ($_=~/^cmd.create/){($cl,$res)=($_=~/\(\"(Class_[A-Z])\",\"(.*)\"\)/);$res=~s/ or / /g;print "\t$cl,$res";}}'; done|sed '1d'|sort -u -k1,1 --merge > pdb_list.mapped.details
+
 echo "No. of pdbs with pml files generated:";
 ls *pml|sed 's/_[A-Z].pml//g'|sort -u|wc
