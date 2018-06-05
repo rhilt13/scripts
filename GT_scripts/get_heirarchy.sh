@@ -321,6 +321,21 @@ cd hier
 hieraln <new_prefix>
 
 ###########################################################
+## Alternative to run_hieraln.sh
+# Manually create a profile for omcBPPS partitions
+mkdir hier 
+cd hier 
+cat -n ../nrrev10_sel1_new.mma|less # Find Random and head lines till before that
+less ../nrrev10_sel1_new.mma |head -<num_from_above>|sed 's/\;BPPS=.*/:/g' > nrrev10_sel1_prof.cma
+less nrrev10_sel1_prof.cma|grep 'BPPS='|cut -f2 -d'='|cut -f1 -d'(' > order
+grep -A1 -f order ../nrrev10_sel1_usr.sma |grep -v '^--$'|grep '^>\|^{' > nrrev10_sel1_prof.cons
+cat nrrev10_sel1_prof.cma|head -2 > head
+tail -1 nrrev10_sel1_prof.cma > tail
+cat head nrrev10_sel1_prof.cons tail > nrrev10_sel1_prof.tpl
+cnt nrrev10_sel1_prof.tpl
+nano nrrev10_sel1_prof.tpl # Replace num of sequences and rename Set1
+
+###########################################################
 
 ## Run hierview
 ## Written as a script in run_hierview_omcbpps.sh
@@ -504,6 +519,10 @@ cat b new_seq.fa > c
 gismo++ new_aln.fa -fast
 
 ##########################################################
+## Keep only aligned positions froma  cma file in fasta format
+
+less seq_set1.fa_aln.cma|perl -lne 'if ($_=~/^>/){print $_;}elsif ($_=~/^\{/){$_=~s/[a-z{}()*]//g;print $_;}'|less
+##########################################################
 
 # Find out which omcBPPS sets contain a pdb file
 
@@ -648,7 +667,7 @@ remove_newline_fasta.pl sel_rev9.c4.short.p90.fa|perl -lne 'if($_=~/^>/){print $
 ## Map pdbs to omcBPPS sets 
 
 ##Included as part of map_pdb_afteromcBPPS.sh script
-less nr_set1_pdb.VSI|grep '^File\|Set'|grep -v 'Set1:'|cut -f2 -d'/'|cut -f1 -d'_'|uniq|tr '\n' ' '|tr ':' '\n'|awk -F "#" '{print $2,$1}'|sort -n > ../pdb_map_table
+less nr_set1_pdb.VSI|grep '^File\|Set'|grep -v 'Set1:'|cut -f2 -d'/'|cut -f1 -d'_'|uniq|tr '\n' ' '|tr ':' '\n'|awk -F "#" '{print $2,$1}'|sort -n > ../map_pdb_table
 
 
 #####################################################
@@ -693,17 +712,29 @@ get-inserts.pl ~/GT/gta_revise9/rungaps_rev9/pdb/pdb_seqres.faa_aln.cma ~/GT/gta
 python pymol_script.py -i pdb_collect -l ~/GT/gta_revise9/mcBPPS/allgta_tree/try5/pdb_map/pdb_list.mapped.details -p ~/GT/pdb/str_GT/PDB/orig -o a.pml
 
 #####################################################
-## From a collection of cma files, perform hmm-hmm comparison and build cluster tree
+## From a collection of cma files, perform hmm-hmm comparison and build cluster tree using pHMM-Tree
 ## Replace file.cma with a cma file with multiple cma files - like output _new.mma from omcBPPS
+# Written as script run_pHMM-Tree.sh
+
 cp /..../file.cma .
 tweakcma file -write 
 mkdir cma 
+mkdir fasta
 mv *cma cma
 cd cma
 mv file.cma ../
+
+## If cma file comes from omcBPPS; 
+sed -i 's/;BPPS=.*:$/:/' *cma
+for i in `ls *cma`; do j=$(echo $i|sed 's/.cma//');cma2fa $j > $j.fasta; done
+for i in `ls *fasta`; do j=$(echo $i|rev|cut -f1 -d'_'|rev|sed 's/.fasta//');k=$(echo $i|sed 's/.fasta//');cat $i|sed "s|consensus seq|$j|" >${k}_1.fasta ; done
+mv *_1.fasta ../fasta 
+rm *fasta 
+
+## Else if cma file already has consensus sequence then run this
 for i in `ls *cma`; do j=$(echo $i|sed 's/.cma//');cma2fa $j|sed '1,3d' > $j.fasta; done
-mkdir ../fasta
 mv *fasta ../fasta/
+
 cd ../
 pHMM-Tree -prc -als fasta/
 cd prc_als_mode_fasta/tree_files
@@ -713,6 +744,7 @@ cmp_trees.py -l tree_list -o tree_dist.txt
 ## Get labels from fasta filenames
 cd ../../fasta
 ls *fasta|perl -lne '@a=split(/_/,$_);$grp=pop(@a);$str=join('_',@a);if ($grp=~/grpA/){$col="#FF0000";}elsif ($grp=~/grpB/){$col="#00FF00";}elsif ($grp=~/grpC/){$col="#0000FF";}else{$col="#00FFFF";}print "$str\tlabel\t$col";' > ../tree.col.txt
+
 cd ../
 cat tree.col.txt|sed 's/label/branch/g'|perl -lne 'print "$_\tnormal";' > tree.bra.txt
 # Add to the top
@@ -827,6 +859,7 @@ tree2hpt tree1.e2.txt.col3 > tree1.e2.txt.col3.hpt
 
 # Make sure I0 or ROOT are named the same in hpt file and .nodes and .col.nodes file
 
+## Method1: Generating the cma files from a cma file with all sequences
 # Get .selID files for each level and node in tree tree1.e2.txt.col
 # 2 ways to get the .selID files
 
@@ -841,12 +874,26 @@ mkdir sub_cma
 ##Copy manually created *_tip.selID files to this folder
 less tree1.e2.txt.col3.hpt|cut -f3 -d' '|sed '1,2d;$ d'|grep '^I'|sed 's/?//g' > tree1.e2.txt.col3.int_nodes
 
-
 cd sub_cma
 # Options to run are inside the script
 # The options will change depending on filenames and run
 build_sma.sh ../gt31_tc_sel2.id2.cma nrtx.part-01
 
+## Method2: Manually generate cma files for the tips and generate cma for leaves.
+## Put all cma files with <tip_name>.cma inside folder sub_cma_manual
+mkdir sub_cma
+cat tree1.e2.txt.col.nodes|perl -lne 'if ($_=~/^I/){@a=split(/\t/,$_);open(OUT,">sub_cma/$a[0]_int.selID");@b=split(/ /,$a[1]);foreach $n(@b){print OUT $n;}close OUT;}'
+for i in `ls sub_cma_manual/*cma`; do head -6 $i|tail -3; done > sub_cma/allcons
+less sub_cma_manual/*cma|head -2 > sub_cma/head
+less sub_cma_manual/*cma|tail -1 > sub_cma/tail
+cd sub_cma
+cat head allcons tail >allcons.cma
+#check the file header to be replaced ([0_(1)=......()])
+cat head 
+build_sma_lite.sh ......
+## Use one of the following or variant based on how cma files need to be changed
+for i in `ls ../sub_cma_manual/*cma`; do j=$(echo $i|rev|cut -f1 -d'/'|rev|sed 's/.cma//');cat $i $j.cons.edit.cma; done
+for i in `ls ../sub_cma_manual/*cma`;do j=$(echo $i|rev|cut -f1 -d'/'|rev|sed 's/.cma//');cat $i|perl -lne 'if ($_=~/^\[/){$_=~s/-.*\(/(/g;print $_;}else{print $_;}' > $j.cons.edit.cma; done
 # Get sma file in the order of hpt file
 for i in `cat ../tree1.e2.txt.col3.hpt|cut -f3 -d' '|sed '1,2d;$ d;s/.$//'`; do cat $i.cons.edit.cma ; done >allcons.sma
 cp allcons.sma ../../gt31_tc.sma 
@@ -861,7 +908,7 @@ cd ..
 # Get edited hpt file
 cat tree1.e2.txt.col3.hpt|rev|sed 's/ //'|rev > ../gt31_tc.hpt
 
-
+### Extra commands
 #cat tree1.e2.txt.col3.hpt|perl -e 'open(IN,"tree1.e2.txt.col3.hpt.name_map");while(<IN>){chomp;@a=split(/ /,$_);$hash{$a[0]}=$a[1];}while(<>){chomp;@b=split(/ /,$_);($sym)=($b[2]=~/(.)$/);$b[2]=~s/.$//;if (exists $hash{$b[2]}){print "$b[0] $b[1]","$hash{$b[2]}","$sym\n";}else{print "$b[0] $b[1]","$b[2]","$sym\n";}}' > ../gt31_tc.hpt
 
 
@@ -909,11 +956,35 @@ score_conservation.py -a Human_COSMC -o cosmc_mc_psi.p99.fa_js_win3 -m ~/tools/c
 perl ~/git/scripts/get-pos-num.pl cosmc_mc_psi.p99.fa > cosmc_mc_psi.p99.fa.pos_map
 # Get interface residues ( or other regions of the protein if required)
 
+############################################################
+## Run starc
+# mkdir starc/<fam_name>
+# cp <cma file with aligned seq for the family>
+# Add or move the sequence with pdb structure to the first seq in the cma file
+# cp <pdb file> .
+
+# run_starc.sh <cma_file>gt6.cma <pdb_file>1lzj.pdb <chain>A <start_pos>116
 
 ############################################################
 ##Change names for the newly identified GT-A families
 sed -i 's/GT16-u|/GT16-A|/g;s/GT31-u|/GT31-A|/g;s/GT60-u|/GT60-A|/g;s/GT32-u|/GT32-A|/g' CAZy_allGT_genbank.faa.IDedit
 
+############################################################
+## ITOL dataset types
+
+TREE_COLORS
+SEPARATOR TAB
+DATA
+#NODE_ID,TYPE,COLOR
+
+DATASET_COLORSTRIP
+SEPARATOR TAB
+DATASET_LABEL	label1
+COLOR	#ff0000
+COLOR_BRANCHES	0
+DATA
+
+############################################################
 ## Long term work
 ## Update everything associated with CAZy 
 ## 1) CAZy pages

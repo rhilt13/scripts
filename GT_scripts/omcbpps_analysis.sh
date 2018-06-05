@@ -16,6 +16,7 @@
 ##		2 if need to run rungaps to get info
 ## $4 = absolute full path to the run_gaps profile (~/rhil_project/GT/gta_revise6/profile/gt_rev6)
 ## $5 = absolute path to order file (~/rhil_project/GT/gta_revise6/profile/order)
+## $6 = absolute path to the folders with pdb files
 ######################################################
 ## Output:
 ## Generates a sets folder that has all files.
@@ -37,8 +38,8 @@
 
 mkdir sets
 cp $1 sets/
-file=$(echo $1|sed 's/\.mma$//g');
-file_short=$(echo $1|sed 's/_new\.mma$//g');
+file=$(echo $1|sed 's/\.[mc]ma$//g');
+file_short=$(echo $1|sed 's/_new\.[mc]ma$//g');
 cd sets
 
 ## Separate _new.mma file into sets
@@ -75,9 +76,8 @@ if [ $3 -eq 2 ]; then
 	## Old one liner
 	## cat hits_details |sed 's/\s+$//g'|perl -e 'while(<>){chomp;if ($_=~/^Set/){$_=~s/Set//g;$a=$_;push(@arr,$a);}else{($b,$c)=($_=~/GT-A\|(.*?)\|cons.* \((\d+)/);push (@arr2,$b);$hash{$a}{$b}=$c;}}print "\t";foreach $n(@arr){print "$n\t";}print "\n";for(@arr2){$foo{$_}++};@unique = (keys %foo);foreach $m(@unique){print "$m\t";foreach $n(@arr){if (defined $hash{$n}{$m}){print "$hash{$n}{$m}\t";}else{print "0\t"}}print "\n";}' > hits_details_parse
 fi
-
 cd ..
-# map_pdb_afteromcBPPS.sh $file_short $2
+map_pdb_afteromcBPPS.sh $file_short $6 $2
 
-# less sets/hits_details|cut -f2 -d'|'|cut -f1 -d' '|sed 's/^Set/~/g'|tr '\n' ' '|tr '~' '\n' > map_fam_info
-# less map_fam_info |perl -e 'while(<>){@a=split(/ /,$_);$hash{$a[0]}=$a[1];}open(IN,"map_pdb_table");while(<IN>){chomp;($num)=($_=~/Set([0-9]+)/);print "$hash{$num}\t$_\n";}' > map_pdb_table_details
+less sets/hits_details|cut -f2 -d'|'|cut -f1 -d' '|sed 's/^Set/~/g'|tr '\n' ' '|tr '~' '\n' > map_fam_info
+less map_fam_info |perl -e 'while(<>){@a=split(/ /,$_);$hash{$a[0]}=$a[1];}open(IN,"map_pdb_table");while(<IN>){chomp;($num)=($_=~/Set([0-9]+)/);print "$hash{$num}\t$_\n";}' > map_pdb_table_details

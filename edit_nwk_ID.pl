@@ -9,7 +9,7 @@ while(<IN>){
   $id=$a[0].":";
   $hash{$id}=$a[1];
 }
-
+# print Dumper(\%hash);
 open(IN2,$ARGV[1]); # tree file
 while(<IN2>){
   chomp;
@@ -18,7 +18,7 @@ while(<IN2>){
   	$j=$k;
   	$j=~s/\\//g;
     # $_=~s/$k/$j|$hash{$k}/g;
-    $_=~s/$k/$hash{$k}:/g;
+    $_=~s/$k/$hash{$k}|$k:/g;
   }
   print "$_\n";
 }

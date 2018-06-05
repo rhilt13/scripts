@@ -6,6 +6,7 @@ while(<IN>){
 	@a=split(/\t/,$_);
 	@b=split(/ /,$a[1]);
 	$hash{$a[0]}{$b[0]}{$a[-1]}=$a[-2];	# change value based on which position you want to map
+	$hash2{$a[0]}{$b[0]}{$a[-1]}=$a[4];	# change value based on which position you want to map
 
 }
 
@@ -17,6 +18,6 @@ while(<IN2>){
 		$mut_pos=$c[23];
 		$mut_pos=~s/.\..//;
 		$mut_pos=~s/.$//;
-		print "$c[1]\t$c[6]\t$c[23]\t$c[24]\t$hash{$c[1]}{$c[6]}{$mut_pos}\n";
+		print "$c[1]\t$c[6]\t$c[23]\t$c[24]\t$hash{$c[1]}{$c[6]}{$mut_pos}\t$hash2{$c[1]}{$c[6]}{$mut_pos}\n";
 	}
 }

@@ -24,9 +24,15 @@ if [ -f $1_new.sets ]; then
 	cp $1_new.sets hier/$2.sets
 elif [ -f $1_chk.sets ]; then
 	cp $1_chk.sets hier/$2.sets
+elif [ -f $1.sets ]; then
+	cp $1.sets hier/$2.sets
 else
+	if [ -f $1.chk ]; then
+		cp $1.chk hier/$2.sets
+	else
 	echo "No sets file. Check for *.sets file."
 	exit 1
+	fi
 fi
 
 if [ -f $1_new.hpt ]; then 
@@ -39,11 +45,10 @@ else
 fi
 
 cd hier
-if [ $3 == "realign" ]; then
+if [ $3 = "realign" ]; then
 	hieraln $2 -realign
 else
 	hieraln $2
 fi
 
 run_map ${2}_himsa
-## After running this, use run_hierview_omcbpps.sh

@@ -52,12 +52,12 @@ if len(sys.argv) > 3:
 
 #########################################
 ## If wish to remove internal nodes to change levels
-remove_nodes=['I8','I9','I10','I12','I44','I45','I46']
-# print remove_nodes
-for n in t.traverse():
-	if n.name in remove_nodes:
-		J = t.search_nodes(name=n.name)[0]
-		J.delete()
+# remove_nodes=['I48']
+# # print remove_nodes
+# for n in t.traverse():
+# 	if n.name in remove_nodes:
+# 		J = t.search_nodes(name=n.name)[0]
+# 		J.delete()
 #########################################
 
 if len(sys.argv) > 4:

@@ -4,7 +4,7 @@ import __main__
 from ete2 import Tree
 
 def main(args):
-
+	outstr=''
 	rf={}
 	max_rf={}
 	name=list()
@@ -25,16 +25,20 @@ def main(args):
 	col_width = max(len(word) for word in name) + 2
 	col_width2=4
 	for key1,val1 in sorted(rf.items()):
-		print "".join(key1.ljust(col_width)),
+		outstr+= str("".join(key1.ljust(col_width)))
 		tot=0
 		ct=0
 		for key2,val2 in sorted(rf.items()):
 			ct+=1
-			print "".join(str(rf[key1][key2]).ljust(col_width2)),
+			outstr+= str("".join(str(rf[key1][key2]).ljust(col_width2)))
 			tot+=rf[key1][key2]
 		avg=tot/ct
-		print "="+"".join(str(avg).ljust(col_width2)),
-		print
+		outstr+= "="+"".join(str(avg))+"/"+str(max_rf[key1][key2])
+		outstr+="\n"
+	print outstr
+	if args.output is not None:
+		with open(args.output, 'w') as outfile:
+			outfile.write(outstr)
 
 if __name__ == "__main__":
     import argparse

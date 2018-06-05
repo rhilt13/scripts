@@ -40,7 +40,8 @@ use Data::Dumper;
 #					$ARGV[3] = filename with list of cma files to compare
 #	=	list	:list aligned position length of each seqence in cma file
 #				 $ARGV[2]=cma file - list lengths of sequences matching previous cma file alongside
-
+#	=	editID	:Edit the IDs of sequences;
+#				 $ARGV[2]=tsv of ID mapping (1st col= original ID, 2nd col=new ID)
 # Example run:
 # perl ~/rhil_project/scripts/parse_cma.pl d102.d104_not.cma unsel tempb
 
@@ -171,6 +172,9 @@ if ($ARGV[1] eq 'sel'){
 			if ($ARGV[3] eq 'genbank'){	# Specific for CAZy idedit sequences
 				@a=split(/\|/,$fin_id);
 				$test_id=$a[1];
+			}elsif ($ARGV[3] eq 'pdb'){	# Specific for CAZy idedit sequences
+				@a=split(/_/,$fin_id);
+				$test_id=$a[0];
 			}
 		}else {
 			@b=split(/ /,$fin_id);
@@ -182,10 +186,10 @@ if ($ARGV[1] eq 'sel'){
 		# print "$fin_id\n";
 		# if (defined $id_hash{$seq_id{$id}}){	# IF NOT CARE ABOUT REDUNDANT
 		# if (defined $id_hash{$fin_id} && (!(defined($print_hash{$fin_id})))){
-		if (defined $id_hash{$test_id} && (!(defined($print_hash{$fin_id})))){
+		if (defined $id_hash{$test_id} && (!(defined($print_hash{$test_id})))){
 		# if (defined $id_hash{$b[0]}){
 			# print "$fin_id\n";
-			$print_hash{$fin_id}=1;
+			$print_hash{$test_id}=1;
 			$ct++;
 			$out .= "\$$ct=$len{$id}($prof{$id}):\n";
 			#$out .= ">$seq_id{$id}\n$seq{$id}\n\n";
@@ -321,16 +325,16 @@ if ($ARGV[1] eq 'len'){
 	$ct=0;
 	foreach $id(sort { $a <=> $b } keys(%len)){
 		@a=split(/\|/,$seq_id{$id});
-		if ($a[2]=~/pdb/){
-			$ct++;
-			$out .= "\$$ct=$len{$id}($prof_len):\n";
-			$out .= ">$seq_id{$id}\n$seq{$id}\n\n";
-		}else{
+		# if ($a[2]=~/pdb/){
+		# 	$ct++;
+		# 	$out .= "\$$ct=$len{$id}($prof_len):\n";
+		# 	$out .= ">$seq_id{$id}\n$seq{$id}\n\n";
+		# }else{
 			if ($len{$id} >= $ARGV[2] and $len{$id} < $ARGV[3]){		# change length
 				$ct++;
 				$out .= "\$$ct=$len{$id}($prof_len):\n";
 				$out .= ">$seq_id{$id} $desc_hash{$id}\n$seq{$id}\n\n";
-			}
+			# }
 		}
 	}
 	print "$sep1_1$ct$sep1_2\n$sep2\n";
@@ -368,7 +372,31 @@ if ($ARGV[1] eq 'sep'){
 
 # print Dumper(\%seq_id);
 
+#### edit sequence IDs #############################################
 
+if ($ARGV[1] eq 'editID'){
+	$ct=0;
+	open(IN2,$ARGV[2]);
+	while(<IN2>){
+  		chomp $_;
+  		@a=split(/\t/,$_);
+  		$new_ID{$a[0]}=$a[1];
+  		# print "$a[0]\n";
+	}
+	foreach $id(sort { $a <=> $b } keys(%len)){
+		$ct++;
+		$out .= "\$$ct=$len{$id}($prof{$id}):\n";
+		# print "$seq_id{$id}\n";
+		if (exists $new_ID{$seq_id{$id}}){		### Specify match unmatch here
+			$out .= ">$new_ID{$seq_id{$id}} $desc_hash{$id}\n$seq{$id}\n\n";
+		}
+	}
+	print "$sep1_1$ct$sep1_2\n$sep2\n";
+	print $out;
+	print "$sep3\n";
+}
+
+## End editID #####################################################
 ## Check specific residue positions ################################
 if ($ARGV[1]=~/[0-9]+/ and !exists($ARGV[2])){
 	$query_pos = $ARGV[1];
@@ -445,6 +473,8 @@ print "$sep3\n";
 }
 
 ##### End Check specific residue positions ##############################
+
+##### Compare cma files to get the best (longest) alignment #############
 $qi=0;
 if ($ARGV[1] eq 'compare'){
 	$qid=0;

@@ -7,6 +7,7 @@ use Data::Dumper;
 #			OR 
 #			= fasta file with aligned multiples sequences 
 # 			ARGV[1] = fasta file with same sequences unaligned, full-length,...
+
 {
 $new=Bio::SeqIO->new(-file=>$ARGV[0], -format=>"fasta");        # FASTA msa file with only 2 sequences or multiple seqs (needs ARGV[1])
 $z=0;
@@ -15,6 +16,8 @@ $k=0;	# Start position of alignment seq 2;
 while($seq=$new->next_seq){
         $z++;
         $id=$seq->id;
+	@a=split(/\|/,$id);
+	$id=$a[3];
         $s=$seq->seq;
         $i=0;
         push(@seqname, $id);
@@ -39,6 +42,7 @@ while($seq=$new->next_seq){
 }
 }
 # print Dumper(\%res);
+# print @seqname;
 
 {
 if (exists $ARGV[1]){
@@ -103,6 +107,26 @@ if (exists $ARGV[1]){
 		print "\n";
 	}
 }
+}
+
+sub Parse_seq_pos {
+	my ($id,$sequence,$i,$j,$k)=@_;
+        @a=split(//,$sequence);
+        foreach $pos(@a){
+            $i++;
+            $hash{$i}=1;
+            $res{$id}{$i}=$pos;
+            if ($pos eq '-'){
+                $ct_gap{$i}++;
+            }else{
+            	$j++;
+                $ct_res{$i}++;
+            }
+            $num{$id}{$i}=$j;
+        }
+        $j=$k;
+	return(\%hash,\%res,\%num);
+
 }
 
 sub Parse_sub {
