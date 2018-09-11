@@ -1,7 +1,7 @@
 #! /usr/bin/perl -w 
 
 use Data::Dumper;
-use Bio::SeqIO;
+#use Bio::SeqIO;
 
 open(IN,$ARGV[0]);
 while(<IN>){
