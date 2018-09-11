@@ -24,6 +24,7 @@ mkdir $3/nr/part;
 mkdir $3/nr/sets;
 mv *.cma $3/nr/part/;
 mv *.seq $3/nr/part/;
+mv *.hits $3/nr/part/;
 cd $3/nr/;
 
 ## Get head and tail for cma files
@@ -31,12 +32,12 @@ head -2 part/nrtx.part-01_aln.cma|sed 's/[(][0-9]*[)][{]/(numnumseq){/g' > head
 tail -1 part/nrtx.part-01_aln.cma > tail
 
 ## Create a number to family mapping file
-less part/nr.part-01.hits|grep '^=='|cut -f3,4 -d' '|sed 's/: /\t/g' > map_fam_info
+cat part/*.hits|grep '^=='|cut -f3,4 -d' '|sed 's/: /\t/g'|sort -un > map_fam_info
 
 ## Concatenate all hits from all parts into a single file
 for i in `ls part/nrtx.part*aln.cma`; do cat $i|sed '1,2d'|head -n -2 >> $4; done
 ## Adding head and tail to make a complete cma file
-for i in `ls $4`; do j=$(cnt $i|sed 's/^\s\+//g'|cut -f1 -d' ');cat ../head $i ../tail|sed "s|numnumseq|$j|" >$i.cma ; done
+for i in `ls $4`; do j=$(cnt $i|sed 's/^\s\+//g'|cut -f1 -d' ');cat head $i tail|sed "s|numnumseq|$j|" >$i.cma ; done
 
 ## Separate out sets of hits
 for i in `ls part/nrtx.part-*[0-9].cma`; do j=$(echo $i|rev|cut -f1 -d'_'|rev|cut -f1 -d'.');cat $i|sed '1,6d'|head -n -2 >> sets/${4}_$j; done

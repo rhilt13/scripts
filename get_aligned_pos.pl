@@ -20,6 +20,8 @@ $Data::Dumper::Sortkeys = sub { [sort { $a <=> $b } keys %{$_[0]}] };
 # How many more gaps than residues
 # No of seq/3, round down - stringent 
 $gap_tol=0.7; 
+## If no.or residues/no.of gaps is equal to or larger than gap_tol
+# $ct_res{$i}/$ct_gap{$i} >= $gap_tol 
 
 $new=Bio::SeqIO->new(-file=>$ARGV[0], -format=>"fasta");	## multiple sequence alignment
 $z=0;
