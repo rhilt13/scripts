@@ -50,8 +50,8 @@ while(<IN>){
 }
 #  print Dumper(\%hash);
 
- ## Compare column in 2nd file
- if ($ARGV[3]=~/^[0-9]+$/){
+## Compare column in 2nd file
+if ($ARGV[3]=~/^[0-9]+$/){
 	$col2=$ARGV[3]-1;
 	$use2='single';
 }else{
@@ -73,9 +73,6 @@ while(<IN2>){
 	}else{
 		$key2=$a[$col2];
 	}
-<<<<<<< HEAD
-}
-=======
  	if (defined $hash{$key2}){
  		if (exists $ARGV[4] and $ARGV[4] eq 'both'){
 	 		print "$_\t$hash{$key2}\n";
@@ -105,4 +102,3 @@ while(<IN2>){
 #		}
 #	}
 #}
->>>>>>> c3fcc9cf62aba5935544a09061a68a3e32a12001
