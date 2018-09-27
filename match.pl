@@ -1,7 +1,7 @@
 #! /usr/bin/perl -w 
 
 use Data::Dumper;
-use Bio::SeqIO;
+#use Bio::SeqIO;
 
 #Ver 0.2
 
@@ -50,8 +50,8 @@ while(<IN>){
 }
 #  print Dumper(\%hash);
 
- ## Compare column in 2nd file
- if ($ARGV[3]=~/^[0-9]+$/){
+## Compare column in 2nd file
+if ($ARGV[3]=~/^[0-9]+$/){
 	$col2=$ARGV[3]-1;
 	$use2='single';
 }else{
