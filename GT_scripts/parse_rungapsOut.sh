@@ -21,3 +21,4 @@ for i in `ls *.cma`; do j=$(echo $i|rev|cut -f1 -d'_'|rev|cut -f1 -d'.');k=$(cat
 
 cat fam_num_list |perl -e 'while(<>){@a=split(/\t/,$_);$hash{$a[0]}=$a[1];}open(IN,"list_hits.txt.count");while(<IN>){chomp;if ($_=~/^\t/){print "$_\n";}else{$_=~s/\s*//g;print "$_\t$hash{$_}\n";}}' > list_hits.txt.count.details
 
+less list_hits.txt.details|perl -lne 'last if ($_=~/^aln/);next if ($_=~/^$/);if ($_=~/^[0-9]/){@a=split(/\t/,$_);$fam=$a[1];}elsif ($_!~/consensus/){$_=~s/^\s+//;($pdb)=($_=~/(.*?) /);print "$fam\t$pdb";}' > list_hits.txt.details.map

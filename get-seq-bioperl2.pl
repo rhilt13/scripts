@@ -28,7 +28,7 @@ while($seq=$new->next_seq){
   $i=$seq->id;
   $s=$seq->seq;
   $i=~s/^\s+|\s+$//g;
-# @a=split(/\|/,$i);
+  @a=split(/\|/,$i);
 #  $a[1]=~s/\.[0-9]+$|//g;
   # print $a[1];
   # ($id)=($seq->id=~/(\S+):/);
@@ -38,7 +38,8 @@ while($seq=$new->next_seq){
   # if($i=~/C.elegans/ && !defined $rep{$i}){
   #if(defined $id_hash{$seq->id}){
   #if(defined $id_hash{$i}){
-  if(defined $id_hash{$i} && !defined $rep{$i}){	# remove sequences with duplicate genbank IDs
+  # if(defined $id_hash{$i} && !defined $rep{$i}){  # remove sequences with duplicate genbank IDs
+  if(defined $id_hash{$a[1]}){	# remove sequences with duplicate genbank IDs
   # if ($id=~/GT12/){
     $rep{$i}=1;
     print ">$i\n$s\n";

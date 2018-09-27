@@ -65,7 +65,7 @@ if [ $3 -eq 2 ]; then
 	for i in `ls *Set*cma.edit.cma`; do j=$(echo $i|sed 's/\.cma$//g'); cma2fa $j|perl -lne 'if ($_=~/^>/){print $_;}else{$_=~s/-//g;print $_;}' > $j.fa; done
 
 	## Run rungaps back to the profiles to find out which families the omcBPPS set hits belong to
-	for i in `ls *fa`; do run_gaps $4 $i -O &>>$i.hits; done
+	for i in `ls *fa`; do run_gaps $4 $i -O -sense=0.68 &>>$i.hits; done
 
 	## Get details of all the hits in one file
 	for i in `ls *hits`; do j=$(echo $i|grep -o 'Set[0-9]*');k=$(cat $i|grep '^==');echo $j $k|sed 's/ =/\n\t/g'; done |sed 's/\s+$//g' > hits_details

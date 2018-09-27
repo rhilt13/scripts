@@ -13,22 +13,26 @@ mat_data <- data.matrix(data[,2:ncol(data)])
 rownames(mat_data) <- rnames 
 # colnames(mat_data) <- cnames 
 # print (cnames)
-distance = dist(mat_data, method = "manhattan")
+distance = dist(mat_data, method = "euclidian")
 # print(distance)
-cluster = hclust(distance, method = "average")
+cluster = hclust(distance, method = "ward")
 
 # heatmap(mat_data)
 print(args[2])
 # my_palette <- colorRampPalette(c("red", "yellow", "green"))(n = 299)
 col_breaks=0:10
 # creates a 10 x 10 inch image
-png(args[2],    # create PNG for the heat map        
-  width = 5*1000,        # 5 x 300 pixels
-  height = 5*1000,
-  res = 500,            # 300 pixels per inch
-  pointsize = 11)        # smaller font size
-
-
+# png(args[2],    # create PNG for the heat map        
+#   width = 5*1000,        # 5 x 300 pixels
+#   height = 5*1000,
+#   res = 500,            # 300 pixels per inch
+#   pointsize = 11)        # smaller font size
+# Create an svg file
+svg(args[2],    # create PNG for the heat map        
+  width = 5,        # 5 x 300 pixels
+  height = 5,
+  # res = 500,            # 300 pixels per inch
+  pointsize = 3)        # smaller font size
 heatmap.2(mat_data,
   # cellnote = mat_data,  # same data set for cell labels
   main = "RMS distance", # heat map title
@@ -40,8 +44,8 @@ heatmap.2(mat_data,
  breaks=col_breaks,    # enable color transition at specified limits
   # dendrogram="row",     # only draw a row dendrogram
   # Rowv="TRUE",#"NA",
-  Rowv = as.dendrogram(cluster),
+  # Rowv = as.dendrogram(cluster),
   Colv = as.dendrogram(cluster))
   # Colv="TRUE")#NA")            # turn off column clustering
 # )
-# dev.off()               # close the PNG device
+dev.off()               # close the PNG device

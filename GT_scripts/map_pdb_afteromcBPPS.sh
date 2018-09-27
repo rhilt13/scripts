@@ -25,7 +25,7 @@ if [[ ! -z "$3" ]]; then
 	  rm -r pdb_map
 	fi
 	mkdir pdb_map
-	cat $3 |grep '^>'|cut -f1 -d'_'|sort -u|cut -f2 -d'>'|sed 's/^/.\//;s/$/_H.pdb/' > pdb_map/pdb_list
+	cat $3 |grep '^>'|cut -f1 -d'_'|sort -u|cut -f2 -d'>'|sed 's/^/.\//;s/$/.pdb/' > pdb_map/pdb_list
 	cd pdb_map
 fi 
 ## This pdb_list true for all GT-A structures

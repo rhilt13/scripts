@@ -1,4 +1,4 @@
-#! /usr/bin/perl -w 
+#! /usr/bin/perl
 
 use Data::Dumper;
 
@@ -12,13 +12,15 @@ use Data::Dumper;
 # $ARGV[0] = input cma file
 # $ARGV[1]
 #	=	fa 		:print fasta sequence
-#	=	len 	:filter sequences by length
+#	=	len 	:filter sequences by length of aligned positions
 #				$ARGV[2]=minimum length; $ARGV[3]=maximum length
 #				$search for line with /change length/ and change min and max length
 #	=	sel 	:print selected sequences
 #				$ARGV[2] = input list of seq id (no >) (matches full ID)
 #				$ARGV[3] (optional) = 'genbank' ; if match only Genbank id aprt of seq id in 
 #								2nd col separated by | (eg: GT31|AAQ31451|H.sapiens)
+#									= 'pdb'; if match pdb IDs, remove chain ID
+#									= 'nrtx'; if match regex to description
 #	=	sel-man	:print selected sequences with manual selections
 #				$ARGV[2] = input pattern to match
 #				$ search for line with /match unmatch/ and change regex
@@ -35,15 +37,24 @@ use Data::Dumper;
 #	=	num 	:print list of residue position numbering
 #	=	rem-gap	:remove gaps at the end of sequences
 #	=	compare	:Compare 2nd cma file to the first and select the best alignment(longest)
-#				 $ARGV[2,3,4....] = cma filenames
+#				 $ARGV[2] = cma filenames
+#					$ARGV[3] = 'print' -list whether sequences are same in 2 cma files
 #				 $ARGV[2] =list
 #					$ARGV[3] = filename with list of cma files to compare
 #	=	list	:list aligned position length of each seqence in cma file
 #				 $ARGV[2]=cma file - list lengths of sequences matching previous cma file alongside
 #	=	editID	:Edit the IDs of sequences;
 #				 $ARGV[2]=tsv of ID mapping (1st col= original ID, 2nd col=new ID)
+#	=	rem-dup	: remove sequences with dupliucate IDs
+#	=	rem-first	: Remove first sequence of cma file
 # Example run:
 # perl ~/rhil_project/scripts/parse_cma.pl d102.d104_not.cma unsel tempb
+
+# sub warn {   
+# 	no warnings 'once';
+#     *other = \&do_some;
+# }
+# warn();
 
 open(IN,$ARGV[0]);
 $id=0;
@@ -71,7 +82,8 @@ while(<IN>){
 			$dup_seq_id{$id}=$_;
 			$dup_seq_id_back{$_}=$id;
 		}else{
-			$seq_id_back{$_}=$id;
+			# $seq_id_back{$_}=$id; 
+			$seq_id_back{$main_id}=$id; # Changed for order option;Takes id with description separate only id for key
 		}
 		# $seq_id{$id}=$_;
 		$seq_id{$id}=$main_id;
@@ -175,6 +187,14 @@ if ($ARGV[1] eq 'sel'){
 			}elsif ($ARGV[3] eq 'pdb'){	# Specific for CAZy idedit sequences
 				@a=split(/_/,$fin_id);
 				$test_id=$a[0];
+			}elsif ($ARGV[3] eq 'nrtx'){
+				$seq_id{$id}=$main_id;
+				$$desc_hash{$id}=$desc_id;
+				($test_id)=($desc_hash{$id}=~/<([A-Za-z ]+?)\([ABEFMV]\)>/);
+				if ($test_id=~/viruses/){
+					$test_id="Virus";
+				}
+				# print "$test_id\n";
 			}
 		}else {
 			@b=split(/ /,$fin_id);
@@ -186,7 +206,7 @@ if ($ARGV[1] eq 'sel'){
 		# print "$fin_id\n";
 		# if (defined $id_hash{$seq_id{$id}}){	# IF NOT CARE ABOUT REDUNDANT
 		# if (defined $id_hash{$fin_id} && (!(defined($print_hash{$fin_id})))){
-		if (defined $id_hash{$test_id} && (!(defined($print_hash{$test_id})))){
+		if (defined $id_hash{$test_id} && ($ARGV[3] eq 'nrtx' || !(defined($print_hash{$test_id})))){
 		# if (defined $id_hash{$b[0]}){
 			# print "$fin_id\n";
 			$print_hash{$test_id}=1;
@@ -194,7 +214,7 @@ if ($ARGV[1] eq 'sel'){
 			$out .= "\$$ct=$len{$id}($prof{$id}):\n";
 			#$out .= ">$seq_id{$id}\n$seq{$id}\n\n";
 			# $out .= ">$id_hash{$fin_id}\n$seq{$id}\n\n";
-			$out .= ">$fin_id\n$seq{$id}\n\n";
+			$out .= ">$fin_id $desc_hash{$id}\n$seq{$id}\n\n";
 		}#else{
 			### If need to control for length
 		# 	if ($len{$id} >=210 and $len{$id} < 600){
@@ -203,6 +223,11 @@ if ($ARGV[1] eq 'sel'){
 		# 		$ct++;
 		# 	}
 		# }
+	}
+	foreach $id(sort keys(%id_hash)){
+		if (!(defined($print_hash{$id}))){
+			print "ERROR: NOT FOUND seq $id\n";
+		}
 	}
 	
 	print "$sep1_1$ct$sep1_2\n$sep2\n";
@@ -221,7 +246,7 @@ if ($ARGV[1] eq 'sel-man'){
 		# if ($seq_id{$id} =~/GT16-u/){		### Specify match unmatch here
 			$ct++;
 			$out .= "\$$ct=$len{$id}($prof{$id}):\n";
-			$out .= ">$seq_id{$id}\n$seq{$id}\n\n";
+			$out .= ">$seq_id{$id} $desc_hash{$id}\n$seq{$id}\n\n";
 		}
 	}
 	print "$sep1_1$ct$sep1_2\n$sep2\n";
@@ -330,7 +355,7 @@ if ($ARGV[1] eq 'len'){
 		# 	$out .= "\$$ct=$len{$id}($prof_len):\n";
 		# 	$out .= ">$seq_id{$id}\n$seq{$id}\n\n";
 		# }else{
-			if ($len{$id} >= $ARGV[2] and $len{$id} < $ARGV[3]){		# change length
+			if ($aligned_ct{$id} >= $ARGV[2] and $aligned_ct{$id} < $ARGV[3]){		# change length
 				$ct++;
 				$out .= "\$$ct=$len{$id}($prof_len):\n";
 				$out .= ">$seq_id{$id} $desc_hash{$id}\n$seq{$id}\n\n";
@@ -397,6 +422,139 @@ if ($ARGV[1] eq 'editID'){
 }
 
 ## End editID #####################################################
+
+########## List length of aligned positions ##############
+if ($ARGV[1] eq 'list'){
+	foreach $id(sort { $a <=> $b } keys(%len)){
+		print "$seq_id{$id}\t$aligned_ct{$id}\n";
+	}
+}
+########## End List length ###############################
+if ($ARGV[1] eq 'rem-first'){
+	foreach $id(sort { $a <=> $b } keys(%len)){
+		# print "$seq_id{$id}\n";
+		if ($id != 1){		### Specify match unmatch here
+			$ct++;
+			$out .= "\$$ct=$len{$id}($prof{$id}):\n";
+			$out .= ">$seq_id{$id} $desc_hash{$id}\n$seq{$id}\n\n";
+		}
+	}
+	print "$sep1_1$ct$sep1_2\n$sep2\n";
+	print $out;
+	print "$sep3\n";
+}
+########## Remove first sequence ###################
+
+########## End Remove first sequence ###################
+
+##### Compare cma files to get the best (longest) alignment #############
+$qi=0;
+if ($ARGV[1] eq 'compare'){
+	$qid=0;
+	if ($ARGV[2] eq 'list'){
+		open(IN3,$ARGV[3]);		# file with a list of cma filenames with proper path
+		while(<IN3>){
+			chomp;
+			# print $_;
+			push @infiles, $_;
+		}
+		close IN3;
+	}else{
+		$infiles[0]=$ARGV[2];
+	}
+	# print "$ARGV[2]",@infiles;
+	foreach $file(@infiles){
+		open(IN2,$file);
+		while(<IN2>){
+			chomp;
+			if ($_=~/^\$/){
+				$qid++;
+				($ql,$qpl)=($_=~/=(\d+)\((\d+)\):/);
+				$qlen{$qid}=$ql;
+				$qprof{$qid}=$qpl;
+			}elsif ($_=~/^>/){
+				$_=~s/^\s+//g;
+				$_=~s/\s+$//g;
+				$_=~s/>//;
+				if (exists $qseq_id_back{$_}){
+					$qdup_seq_id{$qid}=$_;
+					$qdup_seq_id_back{$_}=$qid;
+				}else{
+					$qseq_id_back{$_}=$qid;
+				}
+				$qseq_id{$qid}=$_;
+			}elsif ($_=~/^\{/ || $_=~/^[A-Za-z]/){
+				if (exists ($qdup_seq_id{$qid})){
+					$prev_ct=$qaligned_ct{$qseq_id_back{$qdup_seq_id{$qid}}};
+					$new_ct = () = $_ =~ m/\p{Uppercase}/g;
+					if ($new_ct<=$prev_ct){
+						$qrem_id[$qi]=$qid;
+					}else{
+						$qrem_id[$qi]=$qseq_id_back{$qdup_seq_id{$qid}};
+						$qseq_id_back{$qdup_seq_id{$qid}}=$qdup_seq_id_back{$qdup_seq_id{$qid}};
+					}
+					$qi++;
+				}
+				$qseq{$qid}=$_;
+				$_=~s/[{}()\-\*]//g;
+				$aln = () = $_ =~ m/\p{Uppercase}/g;
+				$qaligned_ct{$qid}=$aln;
+				$_=uc($_);
+			}
+		}
+		close IN2;
+	}
+	delete @qlen{@qrem_id};
+	delete @qprof{@qrem_id};
+	delete @qseq_id{@qrem_id};
+	delete @qseq{@qrem_id};
+	delete @qaligned_ct{@qrem_id};
+	$ct=0;
+	foreach $id(sort { $a <=> $b } keys(%len)){
+		$ct++;
+		if (exists $qseq_id_back{$seq_id{$id}}) {
+			$checked{$qseq_id_back{$seq_id{$id}}}=1;
+			$main_aln=$aligned_ct{$id};
+			$sub_aln=$qaligned_ct{$qseq_id_back{$seq_id{$id}}};
+			# print "$main_aln\t$id\t$seq_id{$id}\n";
+			if (main_aln>=$sub_aln){
+				$out .= "\$$ct=$len{$id}($prof_len):\n";
+				$out .= ">$seq_id{$id}\n$seq{$id}\n\n";
+			}else{
+				$sel=$qseq_id_back{$seq_id{$id}};
+				$out .= "\$$ct=$qlen{$sel}($prof_len):\n";
+				$out .= ">$qseq_id{$sel}\n$qseq{$sel}\n\n";
+			}
+			if ($seq{$id} eq $qseq{$qseq_id_back{$seq_id{$id}}}){
+				$result_list .= "$seq_id{$id}\t$qseq_id{$qseq_id_back{$seq_id{$id}}}\tSame\n";
+			}else{
+				$result_list .= "$seq_id{$id}\t$qseq_id{$qseq_id_back{$seq_id{$id}}}\tDifferent\n";
+			}
+			# print "hi,$aligned_ct{$id},$qaligned_ct{$qseq_id_back{$seq_id{$id}}},$seq_id{$id},$qseq_id_back{$seq_id{$id}}\n";
+		}else{
+			$out .= "\$$ct=$len{$id}($prof_len):\n";
+			$out .= ">$seq_id{$id}\n$seq{$id}\n\n";
+			$result_list .= "$seq_id{$id}\t-\tNot_present\n";
+		}
+	}
+	foreach $qid(sort { $a <=> $b } keys(%qlen)){
+		if (!exists $checked{$qid}){
+			$ct++;
+			$out .= "\$$ct=$qlen{$qid}($prof_len):\n";
+			$out .= ">$qseq_id{$qid}\n$qseq{$qid}\n\n";
+		}
+	}
+	if ($ARGV[3] eq 'print'){
+		print $result_list;
+	}else{
+		print "$sep1_1$ct$sep1_2\n$sep2\n";
+		print $out;
+		print "$sep3\n";
+	}
+}
+
+########## End Compare ###################################
+
 ## Check specific residue positions ################################
 if ($ARGV[1]=~/[0-9]+/ and !exists($ARGV[2])){
 	$query_pos = $ARGV[1];
@@ -474,108 +632,17 @@ print "$sep3\n";
 
 ##### End Check specific residue positions ##############################
 
-##### Compare cma files to get the best (longest) alignment #############
-$qi=0;
-if ($ARGV[1] eq 'compare'){
-	$qid=0;
-	if ($ARGV[2] eq 'list'){
-		open(IN3,$ARGV[3]);		# file with a list of cma filenames with proper path
-		while(<IN3>){
-			chomp;
-			# print $_;
-			push @infiles, $_;
-		}
-		close IN3;
-	}else{
-		@infiles=@ARGV;
-		shift @infiles;
-		shift @infiles;
-	}
-	# print "$ARGV[2]",@infiles;
-	foreach $file(@infiles){
-		open(IN2,$file);
-		while(<IN2>){
-			chomp;
-			if ($_=~/^\$/){
-				$qid++;
-				($ql,$qpl)=($_=~/=(\d+)\((\d+)\):/);
-				$qlen{$qid}=$ql;
-				$qprof{$qid}=$qpl;
-			}elsif ($_=~/^>/){
-				$_=~s/^\s+//g;
-				$_=~s/\s+$//g;
-				$_=~s/>//;
-				if (exists $qseq_id_back{$_}){
-					$qdup_seq_id{$qid}=$_;
-					$qdup_seq_id_back{$_}=$qid;
-				}else{
-					$qseq_id_back{$_}=$qid;
-				}
-				$qseq_id{$qid}=$_;
-			}elsif ($_=~/^\{/ || $_=~/^[A-Za-z]/){
-				if (exists ($qdup_seq_id{$qid})){
-					$prev_ct=$qaligned_ct{$qseq_id_back{$qdup_seq_id{$qid}}};
-					$new_ct = () = $_ =~ m/\p{Uppercase}/g;
-					if ($new_ct<=$prev_ct){
-						$qrem_id[$qi]=$qid;
-					}else{
-						$qrem_id[$qi]=$qseq_id_back{$qdup_seq_id{$qid}};
-						$qseq_id_back{$qdup_seq_id{$qid}}=$qdup_seq_id_back{$qdup_seq_id{$qid}};
-					}
-					$qi++;
-				}
-				$qseq{$qid}=$_;
-				$_=~s/[{}()\-\*]//g;
-				$aln = () = $_ =~ m/\p{Uppercase}/g;
-				$qaligned_ct{$qid}=$aln;
-				$_=uc($_);
-			}
-		}
-		close IN2;
-	}
-	delete @qlen{@qrem_id};
-	delete @qprof{@qrem_id};
-	delete @qseq_id{@qrem_id};
-	delete @qseq{@qrem_id};
-	delete @qaligned_ct{@qrem_id};
-	$ct=0;
+########## Remove duplicated sequences ###################
+if ($ARGV[1] eq 'rem-dup'){
 	foreach $id(sort { $a <=> $b } keys(%len)){
-		$ct++;
-		if (exists $qseq_id_back{$seq_id{$id}}) {
-			$checked{$qseq_id_back{$seq_id{$id}}}=1;
-			$main_aln=$aligned_ct{$id};
-			$sub_aln=$qaligned_ct{$qseq_id_back{$seq_id{$id}}};
-			# print "$main_aln\t$id\t$seq_id{$id}\n";
-			if (main_aln>=$sub_aln){
-				$out .= "\$$ct=$len{$id}($prof_len):\n";
-				$out .= ">$seq_id{$id}\n$seq{$id}\n\n";
-			}else{
-				$sel=$qseq_id_back{$seq_id{$id}};
-				$out .= "\$$ct=$qlen{$sel}($prof_len):\n";
-				$out .= ">$qseq_id{$sel}\n$qseq{$sel}\n\n";
-			}
-			# print "hi,$aligned_ct{$id},$qaligned_ct{$qseq_id_back{$seq_id{$id}}},$seq_id{$id},$qseq_id_back{$seq_id{$id}}\n";
-		}else{
-			$out .= "\$$ct=$len{$id}($prof_len):\n";
-			$out .= ">$seq_id{$id}\n$seq{$id}\n\n";
-		}
-	}
-	foreach $qid(sort { $a <=> $b } keys(%qlen)){
-		if (!exists $checked{$qid}){
+		if (!(defined($print_hash{$seq_id{$id}}))){
 			$ct++;
-			$out .= "\$$ct=$qlen{$qid}($prof_len):\n";
-			$out .= ">$qseq_id{$qid}\n$qseq{$qid}\n\n";
+			$print_hash{$seq_id{$id}}=1;
+			$out .= "\$$ct=$len{$id}($prof_len):\n";
+			$out .= ">$seq_id{$id} $desc_hash{$id}\n$direct_seq{$seq_id{$id}}\n\n";
 		}
 	}
 	print "$sep1_1$ct$sep1_2\n$sep2\n";
 	print $out;
 	print "$sep3\n";
-}
-
-########## End Compare ###################################
-
-if ($ARGV[1] eq 'list'){
-	foreach $id(sort { $a <=> $b } keys(%len)){
-		print "$seq_id{$id}\t$aligned_ct{$id}\n";
-	}
 }

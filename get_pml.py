@@ -12,6 +12,9 @@ import re
 # -c => sel_pdb.cma ( cma file with all pdbs, Strips chain IDs when reading seq name)
 # -d => pdb_domains.txt (Domain boundaries based on cma aligned position: Domain name, start, end, PdbID or -)
 
+# pdb_inserts.txt - Use get_inserts.pl to get this
+# pdb_domains.txt - Type in the domains you want based on the cma aligned positions
+
 #Map variable regions (Get positions from alignment)
 # Map alignment positions to sequence position
 
@@ -22,8 +25,7 @@ import re
 #align
 
 # Command line to run:
-# python get_pml.py -i pdb_collect -n pdb_inserts.txt -l ~/GT/gta_revise9/mcBPPS/allgta_tree/try5/pdb_map/pdb_list.mapped.details -p ~/GT/pdb/str_GT/PDB/orig -o a.pml
-# get_pml.py \
+# python get_pml.py \
 #   -i pdb_collect \
 #   -l ~/GT/gta_revise9/mcBPPS/allgta_tree/try5/pdb_map/pdb_list.mapped.details \
 #   -p ~/GT/pdb/str_GT/PDB/orig/ \
@@ -119,7 +121,15 @@ def map_aligned_pos(cma_file,start_dict):
 					else:
 						ct_gapped+=1
 						pos_ct[seqID][ct_gapped]=ct_full
+	print pos_ct
 	return(pos_ct)
+
+def map_res(pdb,line,pos_map):
+	outstring=''
+	pos_all=line.strip().split(',')
+	for p in pos_all:
+		outstring+=str(pos_map[pdb][int(p)])+","
+	return(outstring)
 
 def map_domains(domain_info, pos_map):
 	dom_map={}
@@ -127,21 +137,31 @@ def map_domains(domain_info, pos_map):
 		for line in inlist.readlines():
 			if line.startswith("#"):
 				continue
-			dom_name,start,end,spec=line.strip().split('\t')
-			dom_map[dom_name]={}
-			if (spec != '-'):
-				# dom_map[dom_name][spec]={}
-				# dom_map[dom_name][spec][spec]={}
-				# pass
-			# 	print pos_map
-			# 	print pos_map[spec]
-				dom_map[dom_name][spec]=str(pos_map[spec][int(start)])+"-"+str(pos_map[spec][int(end)])
-				# dom_map[dom_name][spec][1]=pos_map[spec][int(end)]
+			elif line.startswith("!"):
+				dom_name,reslist,spec=line.strip().split('\t')
+				dom_name=dom_name[1:]
+				dom_map[dom_name]={}
+				if (spec != '-'):
+					dom_map[dom_name][spec]=map_res(spec,reslist,pos_map)
+				else:
+					for key in pos_map:
+						dom_map[dom_name][key]=map_res(key,reslist,pos_map)
 			else:
-				for key in pos_map:
-					# dom_map[dom_name][key]={}
-					dom_map[dom_name][key]=str(pos_map[key][int(start)])+"-"+str(pos_map[key][int(end)])
-					# dom_map[dom_name][key][1]=pos_map[key][int(end)]
+				dom_name,start,end,spec=line.strip().split('\t')
+				dom_map[dom_name]={}
+				if (spec != '-'):
+					# dom_map[dom_name][spec]={}
+					# dom_map[dom_name][spec][spec]={}
+					# pass
+				# 	print pos_map
+				# 	print pos_map[spec]
+					dom_map[dom_name][spec]=str(pos_map[spec][int(start)])+"-"+str(pos_map[spec][int(end)])
+					# dom_map[dom_name][spec][1]=pos_map[spec][int(end)]
+				else:
+					for key in pos_map:
+						# dom_map[dom_name][key]={}
+						dom_map[dom_name][key]=str(pos_map[key][int(start)])+"-"+str(pos_map[key][int(end)])
+						# dom_map[dom_name][key][1]=pos_map[key][int(end)]
 	return(dom_map)
 
 def set_default():
@@ -172,6 +192,7 @@ def main(args):
 			pdb_new=gtfam+"_"+pdb+"full"
 			gtpdb=gtfam+"_"+pdb
 			gtpdbss=gtpdb+"_ss"
+			# print info[pdb]['ends']
 			start,end=info[pdb]['ends'].split('-')
 			start=str(int(start)-1)
 			end=str(int(end)+1)
@@ -195,6 +216,7 @@ def main(args):
 
 			# Map omcBPPS/mcBPPS patterns
 			# print info[pdb]
+			# print gtpdb
 			# print info[pdb]['patterns']
 			out+=map_patterns(gtpdb,info[pdb]['patterns'])
 

@@ -34,8 +34,8 @@ if [[ $3 =~ ^omcBPPS$ ]]; then
 	rm *fasta
 else
 	## Else if cma file already has consensus sequence then run this
-	for i in `ls *cma`; do j=$(echo $i|sed 's/.cma//');cma2fa $j|sed '1,3d' > $j.fasta; done
-	mv *fasta ../fasta/
+	for i in `ls *cma`; do j=$(echo $i|sed 's/.cma//');cma2fa $j|sed '1,3d' > ${j}_1.fasta; done
+	mv *_1.fasta ../fasta/
 fi
 
 cd ../

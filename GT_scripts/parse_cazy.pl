@@ -1,7 +1,7 @@
 #! /usr/bin/perl -w 
 
 open(IN,$ARGV[0]);
-@name=split(/\./,$ARGV[0]);
+@name=split(/_/,$ARGV[0]);
 
 
 while(<IN>){
@@ -32,13 +32,14 @@ while(<IN>){
 				$all_list .="$name[0]\t-\t$sp\t$i\n";
 			}
 		}else{
-			$id_map.="$ARGV[0]\t$id\n";
+			$id_map.="$name[0]\t$id\n";
 			$all_list .= "$name[0]\tmain\t$sp\t$id\n";
 		}
 
 	}
 }
-if ($ARGV[1] eq 'map'){
+
+if (exists $ARGV[1] && $ARGV[1] eq 'map'){
 	print $id_map;
 }else{
 	print $all_list;

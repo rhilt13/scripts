@@ -28,7 +28,7 @@ for line in f:
 if len(sys.argv) > 2:
 	if sys.argv[2] in t:
 		t.set_outgroup(sys.argv[2])
-
+		
 # Create a cache with every node content
 node2labels = t.get_cached_content(store_attr="name")
 

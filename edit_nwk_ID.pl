@@ -17,8 +17,9 @@ while(<IN2>){
     # print "$k\n";
   	$j=$k;
   	$j=~s/\\//g;
-    # $_=~s/$k/$j|$hash{$k}/g;
-    $_=~s/$k/$hash{$k}|$k:/g;
+    #$_=~s/$k/$j|$hash{$k}/g;
+    #$_=~s/$k/$hash{$k}|$k:/g;
+    $_=~s/$k/$hash{$k}:/g;
   }
   print "$_\n";
 }

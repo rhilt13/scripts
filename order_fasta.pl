@@ -12,7 +12,7 @@ while(<IN>){
   #######
   push(@a,$_);
 }
-
+# print @a;
 
 $new=Bio::SeqIO->new(-file=>$ARGV[1], -format=>"fasta");
 

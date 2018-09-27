@@ -5,9 +5,7 @@ $new=Bio::SeqIO->new(-file=>$ARGV[0], -format=>"fasta");
 while($seq=$new->next_seq){
 	$len=length($seq->seq);
 	$s=$seq->seq;
-	if ($ARGV[1]!~/-/){
-		$s=~s/-//g;
-	}
+	$s=~s/-//g;
 	$len_ng=length($s);
 	print $seq->id,"\t$len\t$len_ng\n";
 	$hash{$seq->id}=$len;

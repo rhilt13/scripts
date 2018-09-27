@@ -11,7 +11,7 @@ use Bio::SeqIO;
 # $ARGV[3] - Column no. from file 2 to match
 # $ARGV[4] - both: print columns from both files
 #			 print columns from only 2nd file
-
+# $ARGV[5] -
 # match.pl file1 1 file2 1
 
 # Notes:
@@ -78,6 +78,10 @@ while(<IN2>){
 	 		print "$_\t$hash{$key2}\n";
  		}else{
  			print "$_\n";
+ 		}
+ 	}else{
+ 		if (exists $ARGV[5] and $ARGV[5] eq 'all'){
+ 			print "$_\t==NO MATCH\n";
  		}
  	}
 }

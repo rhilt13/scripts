@@ -391,7 +391,16 @@ parse_cma.pl nr_nongt2.cma len > nr_nongt2.l140.cma
 ## Gt2
 parse_cma.pl nr_gt2.cma len > nr_gt2.l140.cma
 
+### OTHER WAY for the nrtx0, 1, 2 files:
+for i in {1..59}; do tweakcma part/nrtx_prevHits0.seq_${i} -rmcsq;tweakcma part/nrtx_prevHits1.seq_${i} -rmcsq;tweakcma part/nrtx_prevHits2.seq_${i} -rmcsq; cat part/nrtx_prevHits[0-2].seq_${i}.rmcsq.cma >> sets/nrtx_prevHits_${i}.cma; tweakcma sets/nrtx_prevHits_${i} -m;mv sets/nrtx_prevHits_${i}.merged.cma sets/nrtx_prevHits_${i}.cma; done
+cat part/nrtx_prevHits2.seq.hits |grep '^='|cut -f3,4 -d' '|sed 's/: /\t/' > map_fam_info
 
+for i in `ls sets/nrtx_prevHits_[1-9].cma`; do cat $i|sed '1,7d'|head -n -1|head -2000 >> nr_rev11_gt2_sel ; done
+for i in `ls sets/nrtx_prevHits_1[0-9].cma`; do cat $i|sed '1,7d'|head -n -1|head -2000 >> nr_rev11_gt2_sel ; done
+for i in `ls sets/nrtx_prevHits_2[0-4].cma`; do cat $i|sed '1,7d'|head -n -1|head -2000 >> nr_rev11_gt2_sel ; done
+
+for i in `ls sets/nrtx_prevHits_2[5-9].cma`; do cat $i|grep -v '^\[\|^(\|^_' >> nr_rev11_nongt2; done
+for i in `ls sets/nrtx_prevHits_[3-5][0-9].cma`; do cat $i|grep -v '^\[\|^(\|^_' >> nr_rev11_nongt2; done
 ##############################################################
 # Get phyla distribution of all sets from nr
 for i in `ls *.cma`; do n=$(echo $i|sed 's/\.cma//');j=$(tweakcma $n -phyla|grep 'number'|rev|cut -f1 -d ' '|rev);echo $n $j; done > ../phyla_distribution
@@ -709,7 +718,7 @@ cat hits_details |perl -e 'open(IN,"../fam_num_list");while(<IN>){chomp;@a=split
 #####################################################
 ## Create one pml file for all structures, patterns, inserts
 get-inserts.pl ~/GT/gta_revise9/rungaps_rev9/pdb/pdb_seqres.faa_aln.cma ~/GT/gta_revise9/mcBPPS/allgta_tree/try5/pdb_map/pdb_list.mapped.details > pdb_inserts.txt
-python pymol_script.py -i pdb_collect -l ~/GT/gta_revise9/mcBPPS/allgta_tree/try5/pdb_map/pdb_list.mapped.details -p ~/GT/pdb/str_GT/PDB/orig -o a.pml
+get_pml.py.py -i pdb_collect -l ~/GT/gta_revise9/mcBPPS/allgta_tree/try5/pdb_map/pdb_list.mapped.details -n pdb_inserts.txt -p ~/GT/pdb/str_GT/PDB/orig -c sel_pdb.cma -d pdb_domains.txt -o a.pml
 
 #####################################################
 ## From a collection of cma files, perform hmm-hmm comparison and build cluster tree using pHMM-Tree
@@ -755,10 +764,14 @@ DATA
 
 ## Load tree and labels in itol
 
+######################################################
+# Map each IDS to rungaps hit profile
+for i in `ls rungaps/pdb/pdb_seqres.txt_{1..100}.cma`; do cat $i|grep '^>'|cut -f1 -d' '|cut -f2 -d'>'; done|perl -lne 'if ($_=~/^GT/){$fam=$_;}else{print "$fam\t$_";}' > rungaps/pdb/pdb_seqres.txt.hits.map
 #####################################################
 # MD simulation
 
-# To generate more refined pdb strucures with sec. str.
+# To generate more refined pdb strucures with sec. st
+r.
 load_pdbs.py 
 head_trj.py
 
@@ -985,10 +998,48 @@ COLOR_BRANCHES	0
 DATA
 
 ############################################################
+## Compare trees using Sankey diagram
+# https://sankey.csaladen.es/
+
+# Manually make form_main with list of => nodes\tvalues
+# Separate layers using "---"
+cat form_main|perl -e '$j=-1;$i=1;while(<>){chomp;if ($_=~/^-/){$i++;}else{$j++;@a=split(/\t/,$_);print "$j \{\"name\":\"$a[0]\",\"value\":$a[1],\"layer\":$i\}\n";}}' > form_main.list
+cat form_main.list |cut -f2 -d' '|tr '\n' ','|perl -lne 'print "{\"nodes\":[$_]}";' > form_main.list.submit
+# Manually make form_connect with links between nodes using node number labels in form_main.list => source node no. \t target node no. \t value
+less form_connect |perl -lne '@a=split(/\t/,$_);print "\{\"source\":$a[0],\"target\":$a[1],\"value\":$a[2]\}";' > form_connect.list
+less form_connect.list |tr '\n' ','|perl -lne 'print ",\"links\":[$_]}";' > form_connect.list.submit
+
+# Manually combine main and connect.
+cat form_main.list.submit form_connect.list.submit > form_final.submit
+nano form_final.submit
+
+# Remove last comma and curly bracket at end on form_main.list.submit
+# Remove last comma on form_connect.list.submit
+# Save as form_final.submit
+
+############################################################
+## Get counts of nr rungaps output for each of the profile sets after filtering steps:
+# 25..72 for non-gt2s; 1..24 for gt2s
+for i in {25..72}; do echo $i; cnt nr_gtrev12_$i.cma; cnt nr_gtrev12_$i.l140.cma; cnt nr_gtrev12_$i.l140_is90.cma; cnt nr_gtrev12_$i.l140_is90_is92.cma; cnt nr_gtrev12_$i.l140_is90_is92.purge90.cma; done > a
+less a|sed 's/^/~/g;s/^~\s\+/~~/g;s/~~//'|cut -f1 -d' '|tr '\n' '\t'|tr '~' '\n'|sed '1d' > non_gt2_cts.txt
+match.pl non_gt2_cts.txt 1 ../map_fam_info 1 both|cut -f1,2,4- > a
+mv a non_gt2_cts.txt
+# Repeat above for gt2s
+# Columns..
+#	1 - profile set num
+#	2 - profile name
+#	3 - count total hits
+#	4 - count after l140 filter
+#	5 - count after is90 DXD filter
+#	6 - count after is92 DXD filter
+#	7 - count after 90% purge filter
+#	8 - ** Additional manually added column if final selection needs to be manipulated
+
+############################################################
 ## Long term work
 ## Update everything associated with CAZy 
 ## 1) CAZy pages
-## 2) CAZy structures 
+## 2) CAZy structures
 ## 3) CAZy sequences
 ## 4) CAZy characterized sequences
 ## 5) CAZy families list 

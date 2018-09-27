@@ -16,7 +16,7 @@ if [ -d $3/nr ]; then
 fi
 ## Run rungaps on all nrtx partitions
 cd $1;
-for i in `ls nrtx.part-*`; do run_gaps $2 $i -O &>>$i.hits; done
+for i in `ls nrtx.part-*`; do run_gaps $2 $i -O -sense=0.68 &>>$i.hits; done
 
 ## Move output files to designated folder
 mkdir $3/nr/;

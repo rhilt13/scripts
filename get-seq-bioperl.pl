@@ -7,12 +7,13 @@ open(IN,$ARGV[0]);
 
 while(<IN>){
   chomp $_;
-  #@a=split(/\|/,$_);
+  @a=split(/_/,$_);
   # $id_hash{$a[2]}=$a[1];
   # @a=split(/\./,$_);
   # $id_hash{$a[0]}=1;
   #$id_hash{$a[1]}=$_;
-  $id_hash{$_}=1;
+  $id_hash{$a[0]}=$_;
+  #print "$a[0]\n";
 }
 # print Dumper(\%id_hash);
 
@@ -26,20 +27,21 @@ while($seq=$new->next_seq){
   # @a=split(/\|/,$i);
   $s=$seq->seq;
   # $seq_hash{$a[1]}=$s;
-  @b=split(/\|/,$i);
+  @b=split(/_/,$i);
+  #print $b[0];
 #  $a=($i=~/^>(.*?)\|/);
 #  print "$i\n";
 #  print "$b[3]\n";
 #  $ip=$i;
-  $i=~s/\..*$//;
+  # $i=~s/\..*$//;
   # print "$i\n";
-  if(defined $id_hash{$i}){
+  # if(defined $id_hash{$i}){
   # if(defined $id_hash{$ip}){
-  # if(defined $id_hash{$b[1]}){
+  if(defined $id_hash{$b[0]}){
   # if(defined $id_hash{$a[1]} && (!(defined($print_hash{$a[1]})))){
   # if($i=~/GT78/){
   # if ($i=~/^consensus/){
-	print ">$i $d\n$s\n";
+	print ">$id_hash{$b[0]} $d\n$s\n";
 	# print ">$id_hash{$b[1]}\n$s\n";
 
   # print ">human_".$b[3]."|$id_hash{$b[3]}\n$s\n";

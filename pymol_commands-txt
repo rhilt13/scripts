@@ -18,6 +18,7 @@ set sphere_scale, 0.5
 set cartoon_oval_length , 0.8
 set cartoon_oval_width , 0.2
 
+set cartoon_gap_cutoff, 0
 
 bg_color white
 
@@ -55,7 +56,10 @@ cealign target_id mover_id
 Go to editing mode
 Shift + Left click 
 Shift + Middle click
- 
+
+##############
+list all residues in selection
+iterate GActSite, print model,resi,resn 
 ##############
 ## Label specific residues
 label n. ca and i. 5, "%s%s" %(one_letter[resn],resi)
@@ -84,3 +88,9 @@ ray 2400, 2400
 order *,yes
 order R_*, yes
 order 1frg, location=top
+
+########################
+#Pymol 2
+
+set valence, 0
+set cartoon_gap_cutoff, 0

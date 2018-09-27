@@ -68,7 +68,7 @@ sub Parse_sub {
 	@loc= all_match_positions($s,$s1_nogap);
 	if (!@loc){
 		print "ERROR==> Cound not match $i1\n";
-		print "ALIGNED:$s\nORIGINAL:$s1_nogap\n";
+		print "ALIGNED :$s\nORIGINAL:$s1_nogap\n";
 		exit;
 	}
 	foreach $m(@loc){
