@@ -290,8 +290,8 @@ if ($ARGV[1] eq 'unsel'){
 	$ct=0;
 	foreach $id(sort { $a <=> $b } keys(%len)){
 		# @a=split(/\|/,$seq_id{$id});
-		# if (!(defined $id_hash{$seq_id{$id}}) && (!(defined($print_hash{$seq_id{$id}})))){
-		if (!(defined $id_hash{$seq_id{$id}})){
+		if (!(defined $id_hash{$seq_id{$id}}) && (!(defined($print_hash{$seq_id{$id}})))){
+		# if (!(defined $id_hash{$seq_id{$id}})){
 			$ct++;
 			$print_hash{$seq_id{$id}}=1;
 			$out .= "\$$ct=$len{$id}($prof_len):\n";
