@@ -29,22 +29,22 @@ col_breaks=0:10
 #   pointsize = 11)        # smaller font size
 # Create an svg file
 svg(args[2],    # create PNG for the heat map        
-  width = 5,        # 5 x 300 pixels
-  height = 5,
+  width = 30,        # 5 x 300 pixels
+  height = 30,
   # res = 500,            # 300 pixels per inch
-  pointsize = 3)        # smaller font size
+  pointsize = 30)        # smaller font size
 heatmap.2(mat_data,
   # cellnote = mat_data,  # same data set for cell labels
   main = "RMS distance", # heat map title
   notecol="black",      # change font color of cell labels to black
   density.info="none",  # turns off density plot inside color legend
   trace="none",         # turns off trace lines inside the heat map
-  margins =c(12,9),     # widens margins around plot
+  # margins =c(12,9),     # widens margins around plot
   # col=my_palette,       # use on color palette defined earlier
  breaks=col_breaks,    # enable color transition at specified limits
   # dendrogram="row",     # only draw a row dendrogram
   # Rowv="TRUE",#"NA",
-  # Rowv = as.dendrogram(cluster),
+  Rowv = as.dendrogram(cluster),
   Colv = as.dendrogram(cluster))
   # Colv="TRUE")#NA")            # turn off column clustering
 # )

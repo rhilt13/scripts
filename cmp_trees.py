@@ -3,6 +3,8 @@
 import __main__
 from ete2 import Tree
 
+# cmp_trees.py -l tree_list -o tree_dist.txt
+
 def main(args):
 	outstr=''
 	rf={}

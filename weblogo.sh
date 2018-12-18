@@ -7,6 +7,9 @@
 # 3 - input file type (cma or fa)
 # 4 - remove consensus (cons if yes) 
 
+# Sample run for seqlogo
+# for i in `cat list`; do ~/tools/weblogo1/seqlogo -f $i.fa -F PNG -l 346 -m 347 -o ${i}-1 -c -Y -h 5 -T 1 -a; done
+
 ## If starting from a cma file with consensus
 #Remove consensus if needed
 if [[ $4 == "cons" ]]; then
@@ -37,6 +40,7 @@ while read line; do
 	# echo $second
 	j=$(($second-$first+3));
 	seqlogo -f $1.fa -F EPS -h 5 -k 0 -l $first -m $second -o $1.$i -w $j -c -M;
+	# weblogo -f LRRIII_IRAK_TKL.short.fa -D fasta -o lrriii_3 -A protein -s large -X NO --scale-width NO --errorbars NO -C black AVLIPWMF 'nonpolar' -C blue HRK 'basic' -C purple NQ 'amides' -C green GYSTC 'polar' -C red DE 'acidic' -y ' ' -P' ' -l 27 -u 30
 done < $2
 # save logo to filename as cma with numeric extension
 # rm temp_file1 $1.fa 

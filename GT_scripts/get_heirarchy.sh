@@ -539,7 +539,7 @@ for i in `ls cazy_set1.p90.l100_new_Set*.cma`;do echo $i;cat $i|grep '^>'|grep -
 
 ###################
 ## Add CAZy family and species annotation to rungaps output:
-for i in `ls toxo_all.faa_[0-9][0-9].cmqa`; do j=$(cat $i|grep '^>'|head -1|cut -f2 -d'|');export j;cat $i|sed '1,7d'|head -n -2|perl -lne 'if($_=~/^>/){@a=split(/ /,$_);$a[0]=~s/>//;print ">$ENV{j}|$a[0]|T.gondii_Apicomplexa";}else{print $_;}'; done|less
+for i in `ls toxo_all.faa_[0-9][0-9].cma`; do j=$(cat $i|grep '^>'|head -1|cut -f2 -d'|');export j;cat $i|sed '1,7d'|head -n -2|perl -lne 'if($_=~/^>/){@a=split(/ /,$_);$a[0]=~s/>//;print ">$ENV{j}|$a[0]|T.gondii_Apicomplexa";}else{print $_;}'; done|less
 
 ###############################################################################
 
@@ -703,6 +703,7 @@ cat gt8_prune1500.nwk |tr ',' '\n'|cut -f1 -d':'|sed 's/(//g'|grep '\.1\|\.2\|.3
 #####################################################
 ## Get weblogo from cma files
 ## Written as bash script in weblogo.sh
+weblogo -f LRRIII_IRAK_TKL.short.fa -D fasta -o lrriii_3 -A protein -s large -X NO --scale-width NO --errorbars NO -C black AVLIPWMF 'nonpolar' -C blue HRK 'basic' -C purple NQ 'amides' -C green GYSTC 'polar' -C red DE 'acidic' -y ' ' -P' ' -l 27 -u 30
 
 #####################################################
 ## Run cross_rungaps for nr hits
@@ -998,6 +999,9 @@ COLOR_BRANCHES	0
 DATA
 
 ############################################################
+# EMBOSS
+skipredundant # To remove redundant sequences to % identitiy fasta
+############################################################
 ## Compare trees using Sankey diagram
 # https://sankey.csaladen.es/
 
@@ -1034,6 +1038,21 @@ mv a non_gt2_cts.txt
 #	6 - count after is92 DXD filter
 #	7 - count after 90% purge filter
 #	8 - ** Additional manually added column if final selection needs to be manipulated
+
+############################################################
+# Edit cma file names and concatenate all rungaps hits into a single cma file
+for i in `ls ../../../rungaps/nr/sets/run2_l140Aligned/sets_raw/nr_gtrev12_*.l140_is90_is92.cma`; do j=$(echo $i|rev|cut -f1 -d'/'|rev);k=$(echo $j|cut -f1 -d'.'|cut -f3 -d'_');echo $j $k;export k; cat $i|perl -e 'open(IN,"../../../rungaps/nr/map_fam_info");while(<IN>){chomp;@a=split(/\t/,$_);$hash{$a[0]}=$a[1];}while(<>){if ($_=~/^\[/){$_=~s/nrtx.part-01/$hash{$ENV{k}}/;print "$_";}else{print "$_";}}';  done > gtarev12_rungaps_nr_filtered.cma
+
+
+#### 
+# Pymol
+hide everything; set seq_view, 1, GT27_2d7i*; show cartoon, GT27_2d7i;
+
+show cartoon, GT6_*Mt; show cartoon, GT6_*Nt; show cartoon, GT6_*Ct; set seq_view, 1, GT6_*;
+
+############################################################
+# Color for pknB pseudokinases
+cat pknB_allpseudo_p40active.merged.fa|grep '^>'|cut -f1 -d' '|cut -f2 -d'>'|perl -lne 'if ($_=~/^active/){print "$_\t#838383";}elsif ($_=~/Act1/){print "$_\t#800000";}elsif ($_=~/Act2/){print "$_\t#bfef45";}elsif ($_=~/Act3/){print "$_\t#f58231";}elsif ($_=~/ActLanC/){print "$_\t#fffac8";}elsif ($_=~/ActMvin/){print "$_\t#e6194B";}elsif ($_=~/B3A/){print "$_\t#fabebe";}elsif ($_=~/Cyan-PsK/){print "$_\t#aaffc3";}elsif ($_=~/DYD/){print "$_\t#ffd8b1";}elsif ($_=~/HGA/){print "$_\t#ffe119";}elsif ($_=~/NERD-PsK/){print "$_\t#911eb4";}elsif ($_=~/PASTA-PsK/){print "$_\t#808000";}elsif ($_=~/ProTCS-PsK/){print "$_\t#4363d8";}elsif ($_=~/\|TCS-PsK/){print "$_\t#f032e6";}'|less
 
 ############################################################
 ## Long term work

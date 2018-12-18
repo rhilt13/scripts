@@ -6,24 +6,35 @@ use Bio::SeqIO;
 open(IN,$ARGV[0]);	# Index file with ID and map
 while(<IN>){
 	chomp;
-	@a=split(/\|/,$_);
-	$hash{$a[1]}=$_;
+	# @a=split(/\|/,$_);
+	# $hash{$a[1]}=$_;
+	@a=split(/\t/,$_);
+	$hash{$a[0]}=$a[1];
 }
 
 open(IN2,$ARGV[1]);		# Tab separated files
 while(<IN2>){
 	chomp;
-	@b=split(/\t/,$_);
-	if ($b[0]=~/\|/){
-		@c=split(/\|/,$b[0]);
-		$map=$c[1];
+	if ($ARGV[2]=~/tab/){
+		@b=split(/\t/,$_);
+		if ($b[0]=~/\|/){
+			@c=split(/\|/,$b[0]);
+			$map=$c[1];
+		}else{
+			$map=$b[0];
+			# print $map;
+		}
+		if (defined $hash{$map}){
+			# print "$hash{$map}\t$b[1]\t$b[2]\n";
+			print "$hash{$map}\t$b[1]\n";
+		}else{
+			print "$_\n";
+		}
 	}else{
-		$map=$b[0];
-	}
-	if (defined $hash{$map}){
-		print "$hash{$map}\t$b[1]\t$b[2]\n";
-	}else{
-		print "! $_\n";
+		foreach $key(%hash){
+			$_=~s/$key/$hash{$key}/;
+		}
+		print $_;
 	}
 }
 

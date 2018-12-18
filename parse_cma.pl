@@ -60,6 +60,7 @@ open(IN,$ARGV[0]);
 $id=0;
 $grp=0;
 $i=0;
+$j=0;
 while(<IN>){
 	chomp;
 	if ($_=~/^\[/){
@@ -86,8 +87,14 @@ while(<IN>){
 			$seq_id_back{$main_id}=$id; # Changed for order option;Takes id with description separate only id for key
 		}
 		# $seq_id{$id}=$_;
-		$seq_id{$id}=$main_id;
-		$desc_hash{$id}=$desc_id;
+		if (exists $repeat{$main_id}){
+			$j++;
+			$seq_id{$id}=$main_id."_".$j;;
+		}else{
+			$repeat{$main_id}=$id;
+			$seq_id{$id}=$main_id;
+			$desc_hash{$id}=$desc_id;
+		}
 		# print "##$id\t$seq_id{$id}\n";
 		$grp_num{$id}=$grp;
 	}elsif ($_=~/^\{/ || $_=~/^[A-Za-z]/){
@@ -290,8 +297,8 @@ if ($ARGV[1] eq 'unsel'){
 	$ct=0;
 	foreach $id(sort { $a <=> $b } keys(%len)){
 		# @a=split(/\|/,$seq_id{$id});
-		# if (!(defined $id_hash{$seq_id{$id}}) && (!(defined($print_hash{$seq_id{$id}})))){
-		if (!(defined $id_hash{$seq_id{$id}})){
+		if (!(defined $id_hash{$seq_id{$id}}) && (!(defined($print_hash{$seq_id{$id}})))){
+		# if (!(defined $id_hash{$seq_id{$id}})){
 			$ct++;
 			$print_hash{$seq_id{$id}}=1;
 			$out .= "\$$ct=$len{$id}($prof_len):\n";

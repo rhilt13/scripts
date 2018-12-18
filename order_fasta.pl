@@ -21,13 +21,13 @@ while($seq=$new->next_seq){
 	$seq=$seq->seq;
 	## Parse sequence and ID
 	##For | split seq ids
-	@b=split(/\|/,$id);
+	# @b=split(/\|/,$id);
 	# # print "$b[1]\n";
-	$id_hash{$b[1]}=$id;
-	$hash{$b[1]}=$seq;
+	# $id_hash{$b[1]}=$id;
+	# $hash{$b[1]}=$seq;
 	# For complete IDs
-	# $id_hash{$id}=$id;
-	# $hash{$id}=$seq;
+	$id_hash{$id}=$id;
+	$hash{$id}=$seq;
 }
 
 foreach $id(@a){
