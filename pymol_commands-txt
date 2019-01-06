@@ -17,6 +17,13 @@ set sphere_scale, 0.5
 
 set cartoon_oval_length , 0.8
 set cartoon_oval_width , 0.2
+set cartoon_loop_radius, 0.1
+
+set cartoon_rect_length, 1
+set cartoon_rect_width, 0.1
+
+set line_width, 5
+set stick_radius, 0.15
 
 set cartoon_gap_cutoff, 0
 

@@ -9,9 +9,10 @@ use Data::Dumper;
 # $ARGV[1] - which column from 1st file
 # $ARGV[2] - 2nd file with columns to be matched
 # $ARGV[3] - Column no. from file 2 to match
-# $ARGV[4] - both: print columns from both files
+# $ARGV[4] - Delimeter ([ ,\t])
+# $ARGV[5] - both: print columns from both files
 #			 print columns from only 2nd file
-# $ARGV[5] -
+# $ARGV[6] - all: print all lines with "=NO MATCH" tag at the end of line for no matches
 # match.pl file1 1 file2 1
 
 # Notes:
@@ -74,13 +75,13 @@ while(<IN2>){
 		$key2=$a[$col2];
 	}
  	if (defined $hash{$key2}){
- 		if (exists $ARGV[4] and $ARGV[4] eq 'both'){
+ 		if (exists $ARGV[5] and $ARGV[5] eq 'both'){
 	 		print "$_\t$hash{$key2}\n";
  		}else{
  			print "$_\n";
  		}
  	}else{
- 		if (exists $ARGV[5] and $ARGV[5] eq 'all'){
+ 		if (exists $ARGV[6] and $ARGV[6] eq 'all'){
  			print "$_\t==NO MATCH\n";
  		}
  	}
