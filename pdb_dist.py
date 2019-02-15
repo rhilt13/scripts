@@ -28,7 +28,7 @@ print "#Resolution of",Strname,"=",resolution
 #     # break
 for residue1 in chain:
     for residue2 in chain:
-        best_dist=10
+        best_dist=1000
         final_out=''
         if residue1 != residue2:
             # if residue1.get_id()[1] == 227:
@@ -38,11 +38,11 @@ for residue1 in chain:
             # compute distance between CA atoms
             for atom1 in residue1:
                 # print atom1,atom1.get_name(),type(atom1)
-                if (str(atom1.get_name()) not in main_atoms):
+                # if (str(atom1.get_name()) not in main_atoms):
                     # print ">>>>>>>",atom1
                     for atom2 in residue2:
                         # print atom2,atom2.get_name(),type(atom2)
-                        if (str(atom2.get_name()) not in main_atoms):
+                        # if (str(atom2.get_name()) not in main_atoms):
                             # print "##>>>>>>",atom2
                             try:
                                 distance = residue1[atom1.get_name()] - residue2[atom2.get_name()]

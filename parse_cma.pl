@@ -237,7 +237,7 @@ if ($ARGV[1] eq 'sel'){
 	}
 	foreach $id(sort keys(%id_hash)){
 		if (!(defined($print_hash{$id}))){
-			print "ERROR: NOT FOUND seq $id\n";
+			# print "ERROR: NOT FOUND seq $id\n";
 		}
 	}
 	

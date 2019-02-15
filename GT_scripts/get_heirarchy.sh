@@ -1055,6 +1055,39 @@ show cartoon, GT6_*Mt; show cartoon, GT6_*Nt; show cartoon, GT6_*Ct; set seq_vie
 cat pknB_allpseudo_p40active.merged.fa|grep '^>'|cut -f1 -d' '|cut -f2 -d'>'|perl -lne 'if ($_=~/^active/){print "$_\t#838383";}elsif ($_=~/Act1/){print "$_\t#800000";}elsif ($_=~/Act2/){print "$_\t#bfef45";}elsif ($_=~/Act3/){print "$_\t#f58231";}elsif ($_=~/ActLanC/){print "$_\t#fffac8";}elsif ($_=~/ActMvin/){print "$_\t#e6194B";}elsif ($_=~/B3A/){print "$_\t#fabebe";}elsif ($_=~/Cyan-PsK/){print "$_\t#aaffc3";}elsif ($_=~/DYD/){print "$_\t#ffd8b1";}elsif ($_=~/HGA/){print "$_\t#ffe119";}elsif ($_=~/NERD-PsK/){print "$_\t#911eb4";}elsif ($_=~/PASTA-PsK/){print "$_\t#808000";}elsif ($_=~/ProTCS-PsK/){print "$_\t#4363d8";}elsif ($_=~/\|TCS-PsK/){print "$_\t#f032e6";}'|less
 
 ############################################################
+# Collect subset of query sequences 
+# Colect a pool of sequences to pick from (eg: Match_GT12.merged.cma)
+# $1 = list of families
+for i in `cat ../$1`; do cat Match_$i.merged.cma; done > $1.cma
+tweakcma $1 -m
+parse_cma.pl $1.merged.cma sel selIds.e1 > ${1}Sel.cma
+tweakcma ${1}Sel -U90
+tweakcma ${1}Sel.purge90 -csq
+# Copy the consensus sequence 
+nano ${1}Sel.purge90.cma
+# Paste the consensus sequence, change name, seq num, profile name
+
+############################################################
+# Collect co-conserved patterns from pttrns file with annotations in first 4 columns
+# Eg input: /home/rtaujale/GT/gta_revise12/analysis/omcPatternOccurence/nr_rev12sel3.pttrns.padded.fam.mechanism
+
+less $1|awk -v pattern="[A-Z]$2" '{if ($5 ~ pattern){print $0;}}'|cut -f5|tr ',' '\n'|sed 's/[A-Z]//g'|sort|uniq -c|sort -nr|less
+
+### Other scripts to look for co-conserved residue networks
+# Get all partitions with a pair of pattern position
+less nr_rev12sel3.pttrns.padded.fam.mechanism|awk '{if ($5~/[A-Z]116/){print $0;}}'|awk '{if ($5~/[A-Z]93/){print $0;}}'|less
+# Get all partitions with a pattern position 
+less nr_rev12sel3.pttrns.padded.fam.mechanism.e1|awk '{if ($6~/[A-Z]153/){print $0;}}'|less
+# Get a list of pairwise interactions either using a query position(181) or get a list ("list")
+omc_co-conserved_pattern.pl nr_rev12sel3.pttrns.padded.fam.mechanism 181 1|less
+# Get closest nodes/ Build networks for query
+build_network.py -f pairwise_patterns.min50mc30.e1-1.tsv -q Pos71|less
+
+
+############################################################
+# Draw weblogo for all 231 positions for all GT-A families
+for i in `ls *short.fa`; do weblogo -D fasta -A protein -s large -X NO --scale-width NO --errorbars NO -C black AVLIPWMF 'nonpolar' -C blue HRK 'basic' -C purple NQ 'amides' -C green GYSTC 'polar' -C red DE 'acidic' -y ' ' -P' ' -f $i --logo-font Arial-BoldMT -o $i.eps -l 1 -u 231 -n 240; done
+############################################################
 ## Long term work
 ## Update everything associated with CAZy 
 ## 1) CAZy pages

@@ -1,5 +1,10 @@
 #! /bin/bash
 
+# This is deprecated
+# Use weblogo command inside a for loop.
+# Eg:
+# weblogo -D fasta -A protein -s large -X NO --scale-width NO --errorbars NO -C black AVLIPWMF 'nonpolar' -C blue HRK 'basic' -C purple NQ 'amides' -C green GYSTC 'polar' -C red DE 'acidic' -y ' ' -P' ' -f GT12.fa --logo-font Arial-BoldMT -o GT12.eps -l 1 -u 231
+
 ## Input:
 # 1 - input file
 # 2 - file with list of start end positions
