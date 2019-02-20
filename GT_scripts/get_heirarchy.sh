@@ -1085,6 +1085,17 @@ build_network.py -f pairwise_patterns.min50mc30.e1-1.tsv -q Pos71|less
 
 
 ############################################################
+# Map pdb positions to alignment positions
+# Run in GT/pdb/ver--/pos_map folder
+
+# Get a list of start position numbering for all pdb files
+for i in `ls ../PDB/orig/*pdb`; do get_pos_pdb.py $i; done > pdb_start.txt
+# Get a cma file of rungaps hits from pdb_seqres database and convert all IDs to uppercase
+less ~/GT/gta_revise12/rungaps/pdb/try3_sense0.68/pdb_seqres.txt_aln.cma |perl -lne 'if ($_=~/^>/){$_=uc($_);print $_;}else{print $_;}' > pdb_seqres.txt_aln.cma
+# Convert to a fasta alignment
+############################################################
+
+############################################################
 # Draw weblogo for all 231 positions for all GT-A families
 for i in `ls *short.fa`; do weblogo -D fasta -A protein -s large -X NO --scale-width NO --errorbars NO -C black AVLIPWMF 'nonpolar' -C blue HRK 'basic' -C purple NQ 'amides' -C green GYSTC 'polar' -C red DE 'acidic' -y ' ' -P' ' -f $i --logo-font Arial-BoldMT -o $i.eps -l 1 -u 231 -n 240; done
 ############################################################

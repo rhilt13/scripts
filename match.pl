@@ -30,22 +30,25 @@ if ($ARGV[1]=~/^[0-9]+$/){
 	$use1='single';
 }else{
 	$use1='multiple';
-	@columns1=split(/,/,$_);
+	@columns1=split(/,/,$ARGV[1]);
 }
 open(IN,$ARGV[0]);
 while(<IN>){
 	chomp;
 	$_=~s/^\s+|\s+$//g;
-	@a=split(/\t/,$_);
+	@a=split(/$ARGV[4]/,$_);
 	# $a[1]=$a[1]*3-3;
 	# $hash{$a[0]}{$a[1]}=1;
 	# $hash{$_}=1;
 	if ($use1 eq 'multiple'){
+		$key1='';
 		foreach $num(@columns1){
+			$a[$num-1]=~s/^\s+|\s+$//g;
 			$key1.=$a[$num-1];
 		}
 		$hash{$key1}=$_;
 	}else{
+		$a[$col1]=~s/^\s+|\s+$//g;
 		$hash{$a[$col1]}=$_;
 	}
 }
@@ -57,21 +60,22 @@ if ($ARGV[3]=~/^[0-9]+$/){
 	$use2='single';
 }else{
 	$use2='multiple';
-	@columns2=split(/,/,$_);
+	@columns2=split(/,/,$ARGV[3]);
 }
 open(IN2,$ARGV[2]);
-$col2=$ARGV[3]-1;
 while(<IN2>){
  	chomp;
- 	@a=split(/\t/,$_);
- 	$a[$col2]=~s/^\s+|\s+$//g;
+ 	@a=split(/$ARGV[4]/,$_);
  	# @a=split(/\|/,$_);
  	# if (defined $hash{$a[0]}{$a[1]}){
  	if ($use2 eq 'multiple'){
+		$key2='';
 		foreach $num(@columns2){
+			$a[$num-1]=~s/^\s+|\s+$//g;
 			$key2.=$a[$num-1];
 		}
 	}else{
+		$a[$col2]=~s/^\s+|\s+$//g;
 		$key2=$a[$col2];
 	}
  	if (defined $hash{$key2}){
