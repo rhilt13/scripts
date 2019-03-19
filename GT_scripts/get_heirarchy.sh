@@ -1083,6 +1083,12 @@ omc_co-conserved_pattern.pl nr_rev12sel3.pttrns.padded.fam.mechanism 181 1|less
 # Get closest nodes/ Build networks for query
 build_network.py -f pairwise_patterns.min50mc30.e1-1.tsv -q Pos71|less
 
+############################################################
+# Build network of all pattern positions from omcBPPS
+# Build list of patterns for each omcBPPS set
+# Map omcBPPS sets to families (from rungaps)
+# Get frequecies of pattern occurences for larger families (Retaining Vs Inverting)
+# Get counts for co-occuring pairs
 
 ############################################################
 # Map pdb positions to alignment positions
@@ -1090,10 +1096,67 @@ build_network.py -f pairwise_patterns.min50mc30.e1-1.tsv -q Pos71|less
 
 # Get a list of start position numbering for all pdb files
 for i in `ls ../PDB/orig/*pdb`; do get_pos_pdb.py $i; done > pdb_start.txt
+# The above list matches pdbs but does not match the sequence starts.
+# So, use starts from teh omcbpps pdb mapping instead
+
+
 # Get a cma file of rungaps hits from pdb_seqres database and convert all IDs to uppercase
 less ~/GT/gta_revise12/rungaps/pdb/try3_sense0.68/pdb_seqres.txt_aln.cma |perl -lne 'if ($_=~/^>/){$_=uc($_);print $_;}else{print $_;}' > pdb_seqres.txt_aln.cma
 # Convert to a fasta alignment
 ############################################################
+# GT-A insert analysis
+# Get average insert size for each sequence
+for i in `ls *.cma`; do j=$(echo $i|cut -f1 -d'.');export j;cat $i|perl -lne 'if ($_=~/^>/){$id=$_;}elsif($_=~/^{/){$result = 0;$result++ while ($_ =~ m/\p{Lowercase}/g);@a=($_ =~ /([a-z]+)/g);$tot=0;$ct=0;foreach $b(@a){if (length($b)>3){$tot+=length($b);$ct++;}}$avg=$tot/$ct;$del=0;$del++ while($_ =~ m/-/g);$sum=$result+$del;print "$tot\t$ct\t$avg\t$result\t$del\t$sum\t$id";}'; done > ../AllFamIndels/AllFam_indel_avgLength.tsv
+
+
+############################################################
+# Get first position of a pdb file
+#!/usr/bin/env python2.7
+
+import sys
+from Bio.PDB import PDBParser
+from Bio.PDB.Polypeptide import PPBuilder 
+
+parser = PDBParser(PERMISSIVE=1)
+Strname=sys.argv[1]
+structure = parser.get_structure('Str1', Strname)
+model = structure[0]
+pdb_id=Strname.split('/')[-1].replace(".pdb","").upper()
+# pdb_id=pdb_id.replace()
+# print pdb_id
+for chain in model:
+	for res1 in chain:
+		print pdb_id+"_"+chain.get_id()+"\t"+res1.get_resname()+"\t"+str(res1.get_id()[1])
+		# print "%s_%s\t%s\t%s",pdb_id,chain.get_id(),res1.get_resname(),res1.get_id()[1]
+		break
+
+
+############################################################
+# Modify .pml files to get selecetions and objects for all pdbs
+get_pml.py -i pdb_collect -l ../pdb_map/pdb_list.mapped.details -n pdb_inserts.txt -p ~/GT/pdb/ver_0918_gta/PDB/orig -c sel_pdb.cma -d pdb_domains.out3.txt -o out4.pml
+less out4.pml |grep 'Both\|Inv\|Ret' > out4.pml.pttrnMap
+#Copy paste into pymol to create selections
+grep -f sel_pdb2 out4.pml.pttrnMap|grep -v 'Pt2'|less
+# Copy paste to create objects of above selections
+grep -f sel_pdb2 out3.pml.pttrnsMap|grep -v 'Pt2'|cut -f2 -d'"'|perl -lne 'print "create $_","Obj, $_";'|less
+#Copy paste to pymol to create selections within the new objects
+grep -f sel_pdb2 out3.pml.pttrnsMap|grep Pt2|perl -lne '($mech)=($_=~/(_[RIB][a-z]+Pt)[12]"/);$rep=$mech."1";$_=~s/ and/$rep/ee;$_=~s/resi/and resi/;print "$_";'|less
+
+
+# Copy paste in pymol to get base view for each pdb
+grep -f sel_pdb2 out3.pml.pttrnsMap|cut -f2 -d'"'|cut -f1,2 -d'_'|sort -u|perl -lne 'print "hide everything;set seq_view, 0, *;set seq_view, 1, ",$_,"*;show cartoon, $_;show sticks, ",$_,"_DXD;show sticks, ",$_,"_XED;show sticks, ",$_,"_XH;show ribbon, ",$_,"_Gloop;";'|less
+
+
+
+
+############################################################
+# Workflow to map aligned cma positions to pdb residue numbering
+# Download cif format pdb files
+for i in `cat ../pdbList`; do wget https://files.rcsb.org/download/$i.cif; done
+# Get start and end of all pdb sequence chains:
+for i in `ls *cif`; do get_pdb_bounds.pl $i; done > allGT_pdbBounds.txt
+# Map positions using the cma of pdbs and the pdb Bounds file
+list-aligned-pos-pdb.pl full ~/GT/pdb/ver_0918_gta/allGT_pdbBounds.txt ~/GT/gta_revise12/rungaps/pdb/try3_sense0.68/pdb_seqres.txt_aln.cma > GTpdbPos-AlnPos.txt
 
 ############################################################
 # Draw weblogo for all 231 positions for all GT-A families

@@ -1,8 +1,8 @@
 #!/usr/bin/env Rscript
 
 library(ggplot2)
-#library( reshape2 )
-library( RColorBrewer )
+# library(reshape2)
+library(RColorBrewer)
 
 args <- commandArgs(trailingOnly=TRUE)
 
@@ -23,33 +23,40 @@ for (i in 1:length(args)){
 	# colnames(t) <- c("res","aln_pos","3let","pos","cons","asa","bsa","bsa_score","type1","type") 
 
 ######### Histogram ###########################
-	plt <-ggplot(t,aes(x=t))+
-	  geom_histogram(binwidth=10,
-	                 fill = "lightgray",
-	                 color = "black")+
-	  labs(x="Depth",y="Proportion",title="Depth of Coverage distribution- red set")
+	# plt <-ggplot(t,aes(x=t))+
+	#   geom_histogram(binwidth=10,
+	#                  fill = "lightgray",
+	#                  color = "black")+
+	#   labs(x="Depth",y="Proportion",title="Depth of Coverage distribution- red set")
 ###############################################
 
 ######### GT-A Indel data #####################
 	# colnames(t) <- c("Tax","Phylum","Fam","TotalInsert","#OfInserts","AvgInsertSize","Insert_Size","Deletions","Sum") 
-	# num=seq(1, nrow(t), by=1)
+	colnames(t) <- c("Fam","ID","Species","Phylum","Kingdom","DomLen","HV1","HV2","HV3","Nterm","Cterm","FullLen") 
+	num=seq(1, nrow(t), by=1)
 	# t$Fam=with(t, reorder(Fam,AvgInsertSize, median))
-	# plt <- ggplot(t, aes(x=factor(Fam), y=AvgInsertSize)) + 
-	# 	# geom_violin(trim=FALSE) +
-	# 	geom_boxplot(outlier.size=0.5) +
-	# 	# geom_boxplot(fill="light green",outlier.size=1) +
-	# 	# geom_boxplot(aes(fill=Tax),outlier.colour="orange", alpha=0.6) +
-	# 	# facet_wrap(~Tax) +
-	# 	# geom_boxplot() +
-	# 	# geom_dotplot(binaxis='y', stackdir='center', dotsize=0.05) +		
- #  		theme(axis.text.x = element_text(angle = 90, hjust = 1))
+	# t1<- melt(t,fam.vars='Fam', measure.vars=c('HV1','HV2','HV3'))
+	# plt <- ggplot(t1) +
+	# 		geom_boxplot(aes(x=Fam,y=value, color=variable))
 
-	# 	# scale_x_discrete(breaks=c(seq(1,10,1))) +
-	# 	# theme_minimal() +
-	# 	# scale_fill_grey()
-	# 	# scale_fill_gradientn(colours = rev( brewer.pal( 3, "Spectral" ) ))
-	# # plt <- ggplot(t, aes(x=factor(Fam), y=Insert_Size)) + 
- # #  		geom('boxplot') +
+	plt <- ggplot(t, aes(x=Fam, y=HV1)) + 
+		# geom_violin(trim=FALSE) +
+		geom_boxplot(outlier.size=0.5) +
+		# geom_boxplot(fill="light green",outlier.size=1) +
+		# geom_boxplot(aes(fill=Tax),outlier.colour="orange", alpha=0.6) +
+		# facet_wrap(~Tax) +
+		# geom_boxplot() +
+		# geom_dotplot(binaxis='y', stackdir='center', dotsize=0.05) +		
+  		# theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  		coord_flip()
+  	plt + facet_grid(~Kingdom)	#, cols = vars(Fam) #Split panels into rows and columns
+  	# plt + facet_grid(Kingdom ~ Fam)	#Split panels into rows and columns
+		# scale_x_discrete(breaks=c(seq(1,10,1))) +
+		# theme_minimal() +
+		# scale_fill_grey()
+		# scale_fill_gradientn(colours = rev( brewer.pal( 3, "Spectral" ) ))
+	# plt <- ggplot(t, aes(x=factor(Fam), y=Insert_Size)) + 
+ #  		geom('boxplot') +
 ################## End GT-A Indel Figure #####################
 
 

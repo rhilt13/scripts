@@ -121,7 +121,7 @@ def map_aligned_pos(cma_file,start_dict):
 					else:
 						ct_gapped+=1
 						pos_ct[seqID][ct_gapped]=ct_full
-	print pos_ct
+	# print pos_ct
 	return(pos_ct)
 
 def map_res(pdb,line,pos_map):
@@ -138,6 +138,7 @@ def map_domains(domain_info, pos_map):
 			if line.startswith("#"):
 				continue
 			elif line.startswith("!"):
+				print line
 				dom_name,reslist,spec=line.strip().split('\t')
 				dom_name=dom_name[1:]
 				dom_map[dom_name]={}
@@ -147,6 +148,7 @@ def map_domains(domain_info, pos_map):
 					for key in pos_map:
 						dom_map[dom_name][key]=map_res(key,reslist,pos_map)
 			else:
+				print line
 				dom_name,start,end,spec=line.strip().split('\t')
 				dom_map[dom_name]={}
 				if (spec != '-'):

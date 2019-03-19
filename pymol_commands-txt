@@ -35,6 +35,9 @@ bg_color white
 select zn, resn zn
 show sticks, zn 
 
+## Save scene
+scene <name>, store	# Save current scene
+set scene_buttions, 1	# Show scene buttons to switch between scenes
 ## Add bond
 bond resi 234 and resn GLU and name CA, resi 259 and resn SER and name CA
 ## Change color of bond
