@@ -26,6 +26,7 @@ $new=Bio::SeqIO->new(-file=>$ARGV[1], -format=>"fasta");
 while($seq=$new->next_seq){
 	# print $seq->id,"\n";
   $i=$seq->id;
+  $d=$seq->desc;
   $s=$seq->seq;
   $i=~s/^\s+|\s+$//g;
   @a=split(/\|/,$i);
@@ -42,7 +43,7 @@ while($seq=$new->next_seq){
   if(defined $id_hash{$a[1]}){	# remove sequences with duplicate genbank IDs
   # if ($id=~/GT12/){
     $rep{$i}=1;
-    print ">$i\n$s\n";
+    print ">$i $d\n$s\n";
     # print ">$i|$fam{$i}|$locus{$i}\n$s\n";
   }
 }

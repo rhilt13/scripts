@@ -32,7 +32,7 @@ def align_all_to_all(object_list=None,selection='name ca',cutoff=2,cycles=5,debu
 
 
     Example:
-      align_all_to_all object_list=name1 name2 name3 name4, selection=c. a & n. ca, full_matrix=1
+      align_all_to_all object_list=name1 name2 name3 name4, selection=c. a & n. ca, full_matrix=1, method=cealign
   """
   cutoff = int(cutoff)
   full_matrix = int(full_matrix)

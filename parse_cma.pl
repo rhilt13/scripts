@@ -47,6 +47,7 @@ use Data::Dumper;
 #				 $ARGV[2]=tsv of ID mapping (1st col= original ID, 2nd col=new ID)
 #	=	rem-dup	: remove sequences with dupliucate IDs
 #	=	rem-first	: Remove first sequence of cma file
+#	=	rename-dup : rename duplicate IDs
 # Example run:
 # perl ~/rhil_project/scripts/parse_cma.pl d102.d104_not.cma unsel tempb
 
@@ -60,6 +61,7 @@ open(IN,$ARGV[0]);
 $id=0;
 $grp=0;
 $i=0;
+$j=0;
 while(<IN>){
 	chomp;
 	if ($_=~/^\[/){
@@ -86,7 +88,15 @@ while(<IN>){
 			$seq_id_back{$main_id}=$id; # Changed for order option;Takes id with description separate only id for key
 		}
 		# $seq_id{$id}=$_;
-		$seq_id{$id}=$main_id;
+		if (exists $repeat{$main_id}){
+			$dup_num{$main_id}++;
+			$seq_id{$id}=$main_id."_".$dup_num{$main_id};
+			$seq_id_orig{$id}=$main_id;
+		}else{
+			$seq_id{$id}=$main_id;
+			$repeat{$main_id}=$id;
+			$dup_num{$main_id}=1;
+		}
 		$desc_hash{$id}=$desc_id;
 		# print "##$id\t$seq_id{$id}\n";
 		$grp_num{$id}=$grp;
@@ -133,15 +143,16 @@ $ct=0;
 # print "Sep2=",$sep2,"\n";
 # print Dumper(\%seq_id);
 # print Dumper(\%seq_id);
+# print Dumper(\%len);
 
 ## Remove duplicate IDs ##########################################
-delete @len{@rem_id};
-delete @prof{@rem_id};
-delete @seq_id{@rem_id};
-delete @grp_num{@rem_id};
-delete @seq{@rem_id};
-delete @aligned_ct{@rem_id};
-delete @faseq{@rem_id};
+# delete @len{@rem_id};
+# delete @prof{@rem_id};
+# delete @seq_id{@rem_id};
+# delete @grp_num{@rem_id};
+# delete @seq{@rem_id};
+# delete @aligned_ct{@rem_id};
+# delete @faseq{@rem_id};
 
 # print Dumper(\%seq_id);
 
@@ -226,7 +237,7 @@ if ($ARGV[1] eq 'sel'){
 	}
 	foreach $id(sort keys(%id_hash)){
 		if (!(defined($print_hash{$id}))){
-			print "ERROR: NOT FOUND seq $id\n";
+			# print "ERROR: NOT FOUND seq $id\n";
 		}
 	}
 	
@@ -246,7 +257,11 @@ if ($ARGV[1] eq 'sel-man'){
 		# if ($seq_id{$id} =~/GT16-u/){		### Specify match unmatch here
 			$ct++;
 			$out .= "\$$ct=$len{$id}($prof{$id}):\n";
-			$out .= ">$seq_id{$id} $desc_hash{$id}\n$seq{$id}\n\n";
+			$out .= ">$seq_id{$id}";
+			if (exists $desc_hash{$id}){
+				$out .=" $desc_hash{$id}"
+			}
+			$out .="\n$seq{$id}\n\n";
 		}
 	}
 	print "$sep1_1$ct$sep1_2\n$sep2\n";
@@ -265,7 +280,11 @@ if ($ARGV[1] eq 'rem-gap'){
 			# print "$seq{$id}\n";
 			$ct++;
 			$out .= "\$$ct=$len{$id}($prof_len):\n";
-			$out .= ">$seq_id{$id}\n$seq{$id}\n\n";
+			$out .= ">$seq_id{$id}";
+			if (exists $desc_hash{$id}){
+				$out .=" $desc_hash{$id}";
+			}
+			$out .="\n$seq{$id}\n\n";
 		}
 	}
 	print "$sep1_1$ct$sep1_2\n$sep2\n";
@@ -290,12 +309,19 @@ if ($ARGV[1] eq 'unsel'){
 	$ct=0;
 	foreach $id(sort { $a <=> $b } keys(%len)){
 		# @a=split(/\|/,$seq_id{$id});
+		if (exists $seq_id_orig{$id} && defined $id_hash{$seq_id_orig{$id}}){
+			$seq_id{$id}=$seq_id_orig{$id};
+		}
 		if (!(defined $id_hash{$seq_id{$id}}) && (!(defined($print_hash{$seq_id{$id}})))){
 		# if (!(defined $id_hash{$seq_id{$id}})){
 			$ct++;
 			$print_hash{$seq_id{$id}}=1;
 			$out .= "\$$ct=$len{$id}($prof_len):\n";
-			$out .= ">$seq_id{$id} $desc_hash{$id}\n$direct_seq{$seq_id{$id}}\n\n";
+			$out .= ">$seq_id{$id}";
+			if (exists $desc_hash{$id}){
+				$out .=" $desc_hash{$id}";
+			}
+			$out .="\n$direct_seq{$seq_id{$id}}\n\n";
 		}#else{
 			## If need to control for length of sequences
 		# 	if ($len{$id} >=210 and $len{$id} < 600){
@@ -321,6 +347,11 @@ if ($ARGV[1] eq 'order'){
   		chomp $_;
 		$ct++;
   		$out .= "\$$ct=$len{$seq_id_back{$_}}($prof_len):\n";
+		$out .= ">$seq_id{$seq_id_back{$_}}";
+		if (exists $desc_hash{$id}){
+			$out .=" $desc_hash{$seq_id_back{$_}}";
+		}
+		$out .="\n$seq{$seq_id_back{$_}}\n\n";
 		$out .= ">$seq_id{$seq_id_back{$_}}\n$seq{$seq_id_back{$_}}\n\n";
   		# @a=split(/\t/,$_);
   		# $id_hash{$a[2]}=$a[1];
@@ -358,7 +389,11 @@ if ($ARGV[1] eq 'len'){
 			if ($aligned_ct{$id} >= $ARGV[2] and $aligned_ct{$id} < $ARGV[3]){		# change length
 				$ct++;
 				$out .= "\$$ct=$len{$id}($prof_len):\n";
-				$out .= ">$seq_id{$id} $desc_hash{$id}\n$seq{$id}\n\n";
+				$out .= ">$seq_id{$id}";
+				if (exists $desc_hash{$id}){
+					$out .=" $desc_hash{$id}";
+				}
+				$out .="\n$seq{$id}\n\n";
 			# }
 		}
 	}
@@ -430,6 +465,8 @@ if ($ARGV[1] eq 'list'){
 	}
 }
 ########## End List length ###############################
+
+########## Remove first sequence ###################
 if ($ARGV[1] eq 'rem-first'){
 	foreach $id(sort { $a <=> $b } keys(%len)){
 		# print "$seq_id{$id}\n";
@@ -443,9 +480,40 @@ if ($ARGV[1] eq 'rem-first'){
 	print $out;
 	print "$sep3\n";
 }
-########## Remove first sequence ###################
 
 ########## End Remove first sequence ###################
+
+########## Rename duplicate sequences ##############
+
+if ($ARGV[1] eq 'rename-dup'){
+	foreach $id(sort { $a <=> $b } keys(%len)){
+		# print "$id\n";
+		$ct++;
+		$out .= "\$$ct=$len{$id}($prof_len):\n";
+		$out .= ">$seq_id{$id} $desc_hash{$id}\n$seq{$id}\n\n";
+	}
+	print "$sep1_1$ct$sep1_2\n$sep2\n";
+	print $out;
+	print "$sep3\n";
+}
+
+########## End Rename duplicate seq ################
+
+########## Remove duplicated sequences ###################
+if ($ARGV[1] eq 'rem-dup'){
+	foreach $id(sort { $a <=> $b } keys(%len)){
+		if (!(defined($print_hash{$seq_id{$id}}))){
+			$ct++;
+			$print_hash{$seq_id{$id}}=1;
+			$out .= "\$$ct=$len{$id}($prof_len):\n";
+			$out .= ">$seq_id{$id} $desc_hash{$id}\n$direct_seq{$seq_id{$id}}\n\n";
+		}
+	}
+	print "$sep1_1$ct$sep1_2\n$sep2\n";
+	print $out;
+	print "$sep3\n";
+}
+##### End Remove duplicated sequences ####################
 
 ##### Compare cma files to get the best (longest) alignment #############
 $qi=0;
@@ -631,18 +699,3 @@ print "$sep3\n";
 }
 
 ##### End Check specific residue positions ##############################
-
-########## Remove duplicated sequences ###################
-if ($ARGV[1] eq 'rem-dup'){
-	foreach $id(sort { $a <=> $b } keys(%len)){
-		if (!(defined($print_hash{$seq_id{$id}}))){
-			$ct++;
-			$print_hash{$seq_id{$id}}=1;
-			$out .= "\$$ct=$len{$id}($prof_len):\n";
-			$out .= ">$seq_id{$id} $desc_hash{$id}\n$direct_seq{$seq_id{$id}}\n\n";
-		}
-	}
-	print "$sep1_1$ct$sep1_2\n$sep2\n";
-	print $out;
-	print "$sep3\n";
-}

@@ -23,11 +23,23 @@ open(IN2,"$ARGV[1]");
 while(<IN2>){
 	# print $_;
 	chomp;
-	if($_=~/^sets_/){
-		# ($fam_num)=($_=~/_new_(Set[0-9]+).cma.edit/);	#OmcSets Change based on where the family name/num is 
-		($fam_num)=($_=~/nr_gtrev12_([0-9]+)\.l140/);	#RunGaps Change based on where the family name/num is 
-		# $fam=$hash{$fam_num};
-		# print "$_\t--$fam_num\n";
+	# if($_=~/^sets_/){
+	# 	# ($fam_num)=($_=~/_new_(Set[0-9]+).cma.edit/);	#OmcSets Change based on where the family name/num is 
+	# 	($fam_num)=($_=~/nr_gtrev12_([0-9]+)\.l140/);	#RunGaps Change based on where the family name/num is 
+	# 	# $fam=$hash{$fam_num};
+	# 	# print "$_\t--$fam_num\n";
+	# 	$fam=$fam_num;
+	# 	push (@famList,$fam);
+	# if($_=~/^nrtx/){		# For new nrtx sets
+	# 	($fam_num)=($_=~/nrtx.pID_([0-9]+)\.nocsq/);	#RunGaps Change based on where the family name/num is 
+	# 	$fam=$fam_num;
+	# 	push (@famList,$fam);
+	# if($_=~/^nr_rev/){		# For new omcBPPS sets
+	# 	($fam_num)=($_=~/sel3_new_(Set[0-9]+)\.cma/);	#OmcBPPS Change based on where the family name/num is 
+	# 	$fam=$fam_num;
+	# 	push (@famList,$fam);
+	if($_=~/^GT/){		# For new omcBPPS sets
+		($fam_num)=($_=~/^(.*?)\.merged/);	#Rungaps, main fam combined
 		$fam=$fam_num;
 		push (@famList,$fam);
 	}elsif($_=~/^==/){

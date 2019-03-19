@@ -16,8 +16,8 @@ $k=0;	# Start position of alignment seq 2;
 while($seq=$new->next_seq){
         $z++;
         $id=$seq->id;
-	@a=split(/\|/,$id);
-	$id=$a[3];
+	# @a=split(/\|/,$id);
+	# $id=$a[3];
         $s=$seq->seq;
         $i=0;
         push(@seqname, $id);

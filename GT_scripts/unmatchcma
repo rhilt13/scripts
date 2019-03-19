@@ -3,11 +3,11 @@
 # if [ "$1" = "match"]; then
 matchcma $1 $2 -M
 cat Match_${1}|grep '^>'|sed 's/^>//'|cut -f1 -d' ' > $2.ID
-parse_cma.pl $1 unsel $2.ID > ${1}_no88.cma
+parse_cma.pl $1 unsel $2.ID > ${1}_no${2}.cma
 # cat $2.not.cma|grep '^>'|cut -f2 -d'>' > $2.not.cma.ID
 # perl ~/rhil_project/scripts/match.pl $2.not.cma.ID $3 > $2.not.cma.partition
 echo "Found sequences number:"
-cnt ${1}_no.cma
+cnt ${1}_no${2}.cma
 # cat ${1}_no.cma|grep '^>'
 rm Match_$1 #$2.yes.cma
 rm ${1}_exel.rtf $1.pdb $1.ras *.ID

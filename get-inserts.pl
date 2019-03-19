@@ -17,34 +17,39 @@ if (exists $ARGV[2]){
         @c=split(/,/,$a[1]);
         $id=$a[0]."_".$c[1];
         $start{$id}=$b[0];
+        # print "ID=>",$id;
     }
 }
 
 open(IN,$ARGV[0]);
 while(<IN>){
-    chomp;
     @ret=();
 	if ($_=~/^>/){
-        $_=~s/^>//;
+        # print $_;
+        # $_=~s/^>//;
         # $full_id=$_;
         # $id=substr $_,0,4;  # for pdb IDs ( Change as required)
-        ($id)=($_=~/^(.*?) /);
+        ($id)=($_=~/^>(.*?)\s/);
+        # print $id;
     }elsif ($_=~/^\{/){
+    chomp;
         $_=~s/[{}()*-]//g;
         # print $_;    
 	    while ($_ =~ /[a-z]+/g) {
             # print $_;
             push @ret, ( $-[0]."-".$+[0] );
         }
+        # print "IDseq $id\n";
         $inserts{$id}=[@ret];
     }
 }
 # print Dumper( \%inserts );
     # print @ret
 foreach $key(sort keys %inserts){
-    # print "$key\n";
+    # print "KEY=>$key\n";
     # my @value_arr = @{$inserts{$key}};
     if (exists($start{$key})){
+        # print $key;
         $add=$start{$key};
     }else{
         $add=0;

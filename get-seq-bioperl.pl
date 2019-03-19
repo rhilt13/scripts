@@ -7,7 +7,7 @@ open(IN,$ARGV[0]);
 
 while(<IN>){
   chomp $_;
-  @a=split(/_/,$_);
+  @a=split(/ /,$_);
   # $id_hash{$a[2]}=$a[1];
   # @a=split(/\./,$_);
   # $id_hash{$a[0]}=1;
@@ -27,7 +27,7 @@ while($seq=$new->next_seq){
   # @a=split(/\|/,$i);
   $s=$seq->seq;
   # $seq_hash{$a[1]}=$s;
-  @b=split(/_/,$i);
+  @b=split(/ /,$i);
   #print $b[0];
 #  $a=($i=~/^>(.*?)\|/);
 #  print "$i\n";

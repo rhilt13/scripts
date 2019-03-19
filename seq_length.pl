@@ -8,7 +8,7 @@ while($seq=$new->next_seq){
 	$s=~s/-//g;
 	$len_ng=length($s);
 	print $seq->id,"\t$len\t$len_ng\n";
-	$hash{$seq->id}=$len;
+#	$hash{$seq->id}=$len;
 =ccc
 	if ($len <= 900 && $len >= 200){
 	# $hash2{$seq->id}=$seq->seq;

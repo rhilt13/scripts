@@ -6,30 +6,22 @@ while($seq=$new->next_seq){
 	$i=$seq->id;
 	$d=$seq->desc;
 	$s=$seq->seq;
-	if (!exists $hash{$i}){
-		$hash{$i}=1;
-		print ">$i $d\n$s\n";
-	}else{
-		$j=$i."_2";
-		if (!exists $hash{$j}){
-			$hash{$j}=1;
-		print ">$j $d\n$s\n";
+	for ($j=1;$j<=1000;$j++){
+		if ($j>1){
+			$id=$i."_".$j;
 		}else{
-			$k=$i."_3";
-			if (!exists $hash{$k}){
-				$hash{$k}=1;
-				print ">$k $d\n$s\n";
-			}else{
-				$m=$i."_4";
-				if (!exists $hash{$m}){
-				$hash{$m}=1;
-				print ">$m $d\n$s\n";
-				}else{
-					print "ERROR: More than 4 sequences for ",$i,"\n";
-					die;
-				}
-			}
+			$id=$i;
 		}
-	}
+		if (!exists $hash{$i}{$j}){
+			$hash{$i}{$j}=1;
+			if ($d eq ""){
+				print ">$id\n$s\n";
+			}else{
+				print ">$id $d\n$s\n";
+			}
+			# print "$id\n";
+			last;
+		}
 
+	}
 }

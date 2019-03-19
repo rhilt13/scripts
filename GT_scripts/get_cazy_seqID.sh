@@ -78,7 +78,7 @@ done
 
 ## Filter to get only the IDs list
 
-# less cazy_*_ID_list.txt|cut -f4|sort -u > cazy_*_ID_list.txt.ID
+# less cazy_*_ID_list.txt|cut q-f4|sort -u > cazy_*_ID_list.txt.ID
 
 ####Section 4 ########
 ## Run script get_seq_eutil.pl in ~/rhil_project/scripts folder 

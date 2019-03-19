@@ -1,11 +1,19 @@
 #! /bin/bash
 
+# This is deprecated
+# Use weblogo command inside a for loop.
+# Eg:
+# weblogo -D fasta -A protein -s large -X NO --scale-width NO --errorbars NO -C black AVLIPWMF 'nonpolar' -C blue HRK 'basic' -C purple NQ 'amides' -C green GYSTC 'polar' -C red DE 'acidic' -y ' ' -P' ' -f GT12.fa --logo-font Arial-BoldMT -o GT12.eps -l 1 -u 231
+
 ## Input:
 # 1 - input file
 # 2 - file with list of start end positions
 #	~/GT/gta_revise9/analysis/weblogo/test/test_pos.txt
 # 3 - input file type (cma or fa)
 # 4 - remove consensus (cons if yes) 
+
+# Sample run for seqlogo
+# for i in `cat list`; do ~/tools/weblogo1/seqlogo -f $i.fa -F PNG -l 346 -m 347 -o ${i}-1 -c -Y -h 5 -T 1 -a; done
 
 ## If starting from a cma file with consensus
 #Remove consensus if needed
@@ -37,6 +45,7 @@ while read line; do
 	# echo $second
 	j=$(($second-$first+3));
 	seqlogo -f $1.fa -F EPS -h 5 -k 0 -l $first -m $second -o $1.$i -w $j -c -M;
+	# weblogo -f LRRIII_IRAK_TKL.short.fa -D fasta -o lrriii_3 -A protein -s large -X NO --scale-width NO --errorbars NO -C black AVLIPWMF 'nonpolar' -C blue HRK 'basic' -C purple NQ 'amides' -C green GYSTC 'polar' -C red DE 'acidic' -y ' ' -P' ' --logo-font Arial-BoldMT -l 27 -u 30
 done < $2
 # save logo to filename as cma with numeric extension
 # rm temp_file1 $1.fa 
