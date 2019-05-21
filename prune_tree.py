@@ -48,7 +48,8 @@ if len(sys.argv) > 3:
 		# print keep_leaves
 		# print len(keep_leaves)
 		t.prune(keep_leaves)
-# print t1.get_ascii(show_internal=True)
+# print t.get_ascii(show_internal=False)
+# t.write(format=1, outfile=sys.argv[4])
 
 #########################################
 ## If wish to remove internal nodes to change levels

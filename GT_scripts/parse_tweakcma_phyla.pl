@@ -12,13 +12,13 @@
 # Run:
 # parse_tweakcma_phyla.pl map_fam_info gta_rev12_rungaps_tax.raw.e1 > gta_rev12_rungaps_tax.raw.e1.table
 
-open(IN,"$ARGV[0]");
-while(<IN>){
-	chomp;
-	@n=split(/\t/,$_);
-	push(@famList,$n[1]);
-	$hash{$n[0]}=$n[1];
-}
+# open(IN,"$ARGV[0]");
+# while(<IN>){
+# 	chomp;
+# 	@n=split(/\t/,$_);
+# 	push(@famList,$n[1]);
+# 	$hash{$n[0]}=$n[1];
+# }
 open(IN2,"$ARGV[1]");
 while(<IN2>){
 	# print $_;
@@ -45,7 +45,16 @@ while(<IN2>){
 	}elsif($_=~/^==/){
 		$_=~s/=//g;
 		@a=split(/ /,$_);
-		$h1{$a[2]}=$a[1];
+		if ($_=~/unknown/){
+			@b=split(/\(/,$a[2]);
+			if (exists($h1{$b[0]})){
+				$h1{$b[0]}+=$a[1];
+			}else{
+				$h1{$b[0]}=$a[1];
+			}
+		}else{
+			$h1{$a[2]}=$a[1];
+		}
 	}elsif($_=~/^ /){
 		$_=~s/[()]//g;
 		$_=~s/^ +//g;
@@ -89,6 +98,9 @@ while(<IN2>){
 		}else{$out{$fam} .="-,";}
 		if (exists($h1{"viruses"})){
 			$out{$fam} .=$h1{"viruses"}.",";
+		}else{$out{$fam} .="-,";}
+		if (exists($h1{"unknown"})){
+			$out{$fam} .=$h1{"unknown"}.",";
 		}else{$out{$fam} .="-,";}
 		$out{$fam} .="$kingdom,$phyla\n";
 		%h1=();

@@ -4,6 +4,7 @@ import networkx as nx
 import sys 
 import pyfpgrowth
 import re
+import itertools
 
 # build_network.py -f nr_rev12sel3.pttrns.padded.fam.mechanism.Retaining.mainfam.25pos.pairs -q Pos140
 #build_network.py -g nr_rev12sel3.pttrns.padded.fam.mechanism.Retaining.mainfam.25pos
@@ -12,30 +13,52 @@ def main(args):
 	if (args.pttrn):
 		interact=dict()
 		file2=args.pttrn
+		count=dict()
 		with file2 as f2:
 			for line2 in f2.readlines():
 				line2=line2.strip()
 				cols=line2.split('\t')
-				key=cols[0]+"-"+cols[1]+"-"+cols[2]
+				# Define columns
+				level=cols[0]
+				FileNum=cols[1]
+				Set=cols[2]
+				mainfam=cols[3]
+				fam=cols[4]
+				mech=cols[5]
+				pt=cols[6]
+				# key=cols[0]+"-"+cols[1]+"-"+cols[2] # Old pttrn file
+				key = Set+"-"+mainfam+"-"+mech	# New pttrn file with added cols
 				interact[key]=[]
-				cols[4] = re.sub('[A-Z]', '', cols[4])
+				# cols[4] = re.sub('[A-Z]', '', cols[4]) # Old
+				pt = re.sub('[A-Z]', '', pt) # New
 				# print cols[4]
-				positions = cols[4].split(',')
+				positions = pt.split(',')
 				for posNum in positions:
 					interact[key].append(posNum)
 		# print interact
 		interact_list=list()
 		for k in interact:
-			interact_list.append(interact[k])
+			# interact_list.append(interact[k])
 			# print k,"\t",interact[k]
-		print interact_list
-
-		patterns = pyfpgrowth.find_frequent_patterns(interact_list, 2)
-		for j in patterns:
-			if (len(j)>1):
-				# print j[0], j
-				if (abs(int(j[0])-int(j[1]))>2):
-					print j,"\t",len(j),"\t",patterns[j]
+			for m,n in itertools.combinations(interact[k],2):
+				# print m,"==",n
+				if (m<n):
+					p1=m+'-'+n
+				else:
+					p1=n+'-'+m
+				if (p1 in count):
+					count[p1]+=1
+				else:
+					count[p1]=1
+		# print interact_list
+		for c in count:
+			print mech,"\t",c,"\t",count[c]
+		# patterns = pyfpgrowth.find_frequent_patterns(interact_list, 2)
+		# for j in patterns:
+		# 	if (len(j)>1):
+		# 		# print j[0], j
+		# 		if (abs(int(j[0])-int(j[1]))>2):
+		# 			print mech,"\t",j,"\t",len(j),"\t",patterns[j]
 		# rules = pyfpgrowth.generate_association_rules(patterns, 0.9)
 		# for j in rules:
 		# 	print j,"\t",rules[j]#[0]

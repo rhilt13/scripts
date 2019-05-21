@@ -13,6 +13,8 @@ import re
 # -d => pdb_domains.txt (Domain boundaries based on cma aligned position: Domain name, start, end, PdbID or -)
 
 # pdb_inserts.txt - Use get_inserts.pl to get this
+# get-inserts.pl sel_pdb.cma 4 ../pdb_map/pdb_list.mapped.details  > pdb_inserts.txt
+
 # pdb_domains.txt - Type in the domains you want based on the cma aligned positions
 
 #Map variable regions (Get positions from alignment)
@@ -20,9 +22,9 @@ import re
 
 # Functions:
 # parse_pdbDetails
-#get_domain
-#map_positions
-#align
+# get_domain
+# map_positions
+# align
 
 # Command line to run:
 # python get_pml.py \
@@ -138,7 +140,7 @@ def map_domains(domain_info, pos_map):
 			if line.startswith("#"):
 				continue
 			elif line.startswith("!"):
-				print line
+				# print line
 				dom_name,reslist,spec=line.strip().split('\t')
 				dom_name=dom_name[1:]
 				dom_map[dom_name]={}
@@ -148,7 +150,7 @@ def map_domains(domain_info, pos_map):
 					for key in pos_map:
 						dom_map[dom_name][key]=map_res(key,reslist,pos_map)
 			else:
-				print line
+				# print line
 				dom_name,start,end,spec=line.strip().split('\t')
 				dom_map[dom_name]={}
 				if (spec != '-'):

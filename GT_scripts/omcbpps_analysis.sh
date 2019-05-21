@@ -5,6 +5,12 @@
 ## Run in the omcbpps output folder
 ## Will create the sets folder
 ## Will create the pdb_map folder
+######################################################
+# Need following programs to be added to path:
+# map_pdb_afteromcBPPS.sh
+# parse_omcbppsSets_hit_list.pl
+# tweakcma
+# sarp
 
 ######################################################
 ## Input:
@@ -80,4 +86,5 @@ cd ..
 map_pdb_afteromcBPPS.sh $file_short $6 $2
 
 less sets/hits_details|cut -f2 -d'|'|cut -f1 -d' '|sed 's/^Set/~/g'|tr '\n' ' '|tr '~' '\n' > map_fam_info
-less map_fam_info |perl -e 'while(<>){@a=split(/ /,$_);$hash{$a[0]}=$a[1];}open(IN,"map_pdb_table");while(<IN>){chomp;($num)=($_=~/Set([0-9]+)/);print "$hash{$num}\t$_\n";}' > map_pdb_table_details
+less sets/hits_details|perl -e 'while(<>){chomp;if ($_=~/^Set/){($sn)=($_=~/Set([0-9]+)/);print "\n$sn\t";}elsif($_=~/File/){($fam)=($_=~/GT-A\|(.*?)[| ]/);($nseq)=($_=~/\(([0-9]+) /);print "$fam($nseq),";}}'|sed 's/,$//' > map_fam_info_details
+less map_fam_info |perl -e 'while(<>){@a=split(/ /,$_);$hash{$a[0]}=$a[1];}open(IN,"map_pdb_table");while(<IN>){chomp;($num)=($_=~/Set([0-9]+$)/);print "$hash{$num}\t$_\n";}' > map_pdb_table_details
