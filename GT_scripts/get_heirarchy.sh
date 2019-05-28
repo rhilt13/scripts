@@ -406,6 +406,8 @@ for i in `ls sets/nrtx_prevHits_[3-5][0-9].cma`; do cat $i|grep -v '^\[\|^(\|^_'
 for i in `ls *.cma`; do n=$(echo $i|sed 's/\.cma//');j=$(tweakcma $n -phyla|grep 'number'|rev|cut -f1 -d ' '|rev);echo $n $j; done > ../phyla_distribution
 less ../../../gta_revise8/rungaps_rev8/nr/phyla_distribution |perl -e 'open(IN,"../../../gta_revise8/rungaps_rev8/nr/fam_num_list");while(<IN>){chomp;@a=split(/\t/,$_);$hash{$a[0]}=$a[1];}while(<>){chomp;($num)=($_=~/_([0-9]+)\s/);print "$_\t$hash{$num}\n";}'|less
 
+for i in `ls ugdh_sel1_new_Set*.cma`; do j=$(echo $i|rev|cut -f1 -d'_'|rev|cut -f1 -d'.');echo $j;k=$(echo $i|sed 's/.cma$//');echo $k; tweakcma $k -phyla|grep '^='|sed 's/=//g;s/^ \+//'; done > phyla_raw
+
 ##############################################################
 # Written as script: get-best-rep.sh
 ## Select best representative sequences for each phyla from each hit set from nr rungaps
@@ -677,6 +679,7 @@ remove_newline_fasta.pl sel_rev9.c4.short.p90.fa|perl -lne 'if($_=~/^>/){print $
 
 ##Included as part of map_pdb_afteromcBPPS.sh script
 less nr_set1_pdb.VSI|grep '^File\|Set'|grep -v 'Set1:'|cut -f2 -d'/'|cut -f1 -d'_'|uniq|tr '\n' ' '|tr ':' '\n'|awk -F "#" '{print $2,$1}'|sort -n > ../map_pdb_table
+less nrrev13_sel1_pdb.VSI|grep '^File\|Set\|Group'|grep -v 'Set1:'|cut -f2 -d'/'|perl -e '$p=0;$n=0;while(<>){chomp;$_=~s/ //g;$_=~s/#//g;if ($_=~/Set/){if ($n==1){print "\t";$n=0;}$p=1;$_=~s/# //;$_=~s/://;print "$_,";}else{$_=~s/.pdb\:/-/;if ($p==1){print "\n";$p=0;$n=1;print "$_,";}else{print "$_,";$n=1;}}}'|sed 's/,\t/\t/;s/,$//' > ../map_pdb_table
 
 
 #####################################################
@@ -762,6 +765,14 @@ TREE_COLORS
 SEPARATOR TAB
 DATA
 #NODE_ID,TYPE,COLOR
+
+# Add to top of protein_domains text file for iTOL
+DATASET_DOMAINS
+SEPARATOR COMMA
+DATASET_LABEL,boundaries1
+COLOR,#ff0000
+DATASET_SCALE,50,100,150,200
+DATA
 
 ## Load tree and labels in itol
 

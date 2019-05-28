@@ -2,6 +2,9 @@
 
 use Data::Dumper;
 
+# Ver: 1.0.0
+# Started versioning after adding the sel-pos option
+
 # works only if you wish to print a single cma file
 # cannot generate multicma files
 # If input is multicma files, careful of cma separator lines: grep '^\['
@@ -48,6 +51,12 @@ use Data::Dumper;
 #	=	rem-dup	: remove sequences with dupliucate IDs
 #	=	rem-first	: Remove first sequence of cma file
 #	=	rename-dup : rename duplicate IDs
+#	=	sel-pos	: Print residues in selected positions only as cma file
+#				$ARGV[2] = List of selected positions (Eg 2,3,4,5-10 prints positions 2 to 10)
+#				$ARGV[3] (optional) = SkipZero: Skips sequences with gaps in all selected positions
+#									= PrintAll: Prints all sequences regardless of zero length.
+#									Default: Errors and dies if sequence length of zero found.
+
 # Example run:
 # perl ~/rhil_project/scripts/parse_cma.pl d102.d104_not.cma unsel tempb
 
@@ -79,6 +88,9 @@ while(<IN>){
 		$_=~s/>//;
 		@a=split(/ /,$_);
 		$main_id=shift @a;
+		($sub_id)=($main_id=~/^(.*?)\.[0-9]$/);	# Remove last number for genbank IDs.
+		# print "$main_id == $sub_id\n";
+		$id2{$main_id}=$sub_id;
 		$desc_id=join ' ',@a;
 		if (exists $seq_id_back{$_}){
 			$dup_seq_id{$id}=$_;
@@ -351,7 +363,7 @@ if ($ARGV[1] eq 'order'){
 		if (exists $desc_hash{$id}){
 			$out .=" $desc_hash{$seq_id_back{$_}}";
 		}
-		$out .="\n$seq{$seq_id_back{$_}}\n\n";
+		# $out .="\n$seq{$seq_id_back{$_}}\n\n";
 		$out .= ">$seq_id{$seq_id_back{$_}}\n$seq{$seq_id_back{$_}}\n\n";
   		# @a=split(/\t/,$_);
   		# $id_hash{$a[2]}=$a[1];
@@ -431,6 +443,7 @@ if ($ARGV[1] eq 'sep'){
 ## End Separate specific group #####################################
 
 # print Dumper(\%seq_id);
+# print Dumper(\%id2);
 
 #### edit sequence IDs #############################################
 
@@ -446,9 +459,17 @@ if ($ARGV[1] eq 'editID'){
 	foreach $id(sort { $a <=> $b } keys(%len)){
 		$ct++;
 		$out .= "\$$ct=$len{$id}($prof{$id}):\n";
-		# print "$seq_id{$id}\n";
+		# print "$id\t$seq_id{$id}\t$id2{$seq_id{$id}}\t$seq_id_orig{$id}\n";
 		if (exists $new_ID{$seq_id{$id}}){		### Specify match unmatch here
 			$out .= ">$new_ID{$seq_id{$id}} $desc_hash{$id}\n$seq{$id}\n\n";
+		}elsif (exists $new_ID{$id2{$seq_id{$id}}}){
+			$out .= ">$new_ID{$id2{$seq_id{$id}}} $desc_hash{$id}\n$seq{$id}\n\n";
+		}elsif (exists $new_ID{$id2{$seq_id_orig{$id}}}){
+			$out .= ">$new_ID{$id2{$seq_id_orig{$id}}} $desc_hash{$id}\n$seq{$id}\n\n";
+		}elsif (exists $new_ID{$seq_id_orig{$id}}){
+			$out .= ">$new_ID{$seq_id_orig{$id}} $desc_hash{$id}\n$seq{$id}\n\n";
+		}else{
+			$out .= ">$seq_id{$id} $desc_hash{$id}\n$seq{$id}\n\n";
 		}
 	}
 	print "$sep1_1$ct$sep1_2\n$sep2\n";
@@ -623,6 +644,89 @@ if ($ARGV[1] eq 'compare'){
 
 ########## End Compare ###################################
 
+##### Print list of residue position numbering #################
+
+if ($ARGV[1] eq 'num'){
+	# $query_pos = $ARGV[1];
+	#print "$sep1\n$sep2\n";
+	$ct=1;
+	foreach $id(sort { $a <=> $b } keys(%seq_id)){
+		$pos=0;
+		@b=split(//,$seq{$id});
+		print "$seq_id{$id}\n";
+		foreach $res(@b){
+			if ($res=~/[A-Z-]/){
+				$pos++;
+			}
+			print "$pos\t$res\n";
+			# if ($pos==$query_pos and $res eq 'H'){
+			# 	# print "\$$ct=$len{$id}(156)\n";
+			# 	# print "$seq_id{$id}\n$seq{$id}\n\n";
+			# 	$ct++;
+			# }
+		}
+	}	
+print "$sep3\n";
+}
+##### End Numbering ################################################
+
+##### Print only specified positions ###############################
+if ($ARGV[1] eq 'sel-pos'){
+	@Pos=split(/,/,$ARGV[2]);
+	foreach $p(@Pos){
+		if ($p=~/-/){
+			@r=split(/-/,$p);
+			for ($i=$r[0];$i<=$r[1];$i++){
+				$selPos{$i}=1;
+			}
+		}else{
+			$selPos{$p}=1;
+		}
+	}
+	$prof_len= keys %selPos;
+	foreach $id(sort { $a <=> $b } keys(%len)){
+		$pos=0;
+		$seq_len=0;
+		$shortSeq='';
+		@b=split(//,$seq{$id});
+		foreach $res(@b){
+			if ($res=~/[A-Z-]/){
+				$pos++;
+				if (exists($selPos{$pos})){
+					$shortSeq.=$res;
+					if ($res=~/[A-Z]/){
+						$seq_len++;
+					}
+				}
+			}elsif ($res=~/[{}()*]/){
+				$shortSeq.=$res;
+			}
+			# print "$pos\t$res\t$shortSeq\n";
+		}
+		if ($seq_len==0){
+			if (!exists $ARGV[3]){
+				print "ERROR: Sequence of length 0 encountered\n";
+				print "Seq Num:$ct; ID: $seq_id{$id} $desc_hash{$id}\n$shortSeq\n";
+				print "Add 4th option:\n\t\"SkipDie\" to skip these sequences.\n\t\"PrintAll\" to print all sequences.\n";
+				die;
+			}elsif ($ARGV[3]=~/SkipZero/){
+				next;
+			}
+		}
+		$ct++;
+		$print_hash{$seq_id{$id}}=1;
+		$out .= "\$$ct=$seq_len($prof_len):\n";
+		$out .= ">$seq_id{$id} $desc_hash{$id}\n$shortSeq\n\n";
+	}
+	print "$sep1_1$ct$sep1_2\n";
+	print "($prof_len)";
+	for ($i=0;$i<$prof_len;$i++){print "*";}print "\n";
+	print $out;
+	print "$sep3\n";
+}
+
+##### End Print Positions ##########################################
+
 ## Check specific residue positions ################################
 if ($ARGV[1]=~/[0-9]+/ and !exists($ARGV[2])){
 	$query_pos = $ARGV[1];
@@ -646,29 +750,6 @@ if ($ARGV[1]=~/[0-9]+/ and !exists($ARGV[2])){
 	print "$sep1_1$ct$sep1_2\n$sep2\n";
 	print $out;
 	print "$sep3\n";
-}
-
-if ($ARGV[1] eq 'num'){
-	# $query_pos = $ARGV[1];
-	#print "$sep1\n$sep2\n";
-	$ct=1;
-	foreach $id(sort { $a <=> $b } keys(%seq_id)){
-		$pos=0;
-		@b=split(//,$seq{$id});
-		print "$seq_id{$id}\n";
-		foreach $res(@b){
-			if ($res=~/[A-Z-]/){
-				$pos++;
-			}
-			print "$pos\t$res\n";
-			# if ($pos==$query_pos and $res eq 'H'){
-			# 	# print "\$$ct=$len{$id}(156)\n";
-			# 	# print "$seq_id{$id}\n$seq{$id}\n\n";
-			# 	$ct++;
-			# }
-		}
-	}	
-print "$sep3\n";
 }
 
 if ($ARGV[1]=~/[0-9]+/ and $ARGV[2]=~/[0-9]+/){

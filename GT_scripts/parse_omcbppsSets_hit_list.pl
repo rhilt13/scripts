@@ -13,7 +13,7 @@ while(<IN>){
 		$_=~s/Set//g;
 		$a=$_;
 		push(@arr,$a);
-	}else{
+	}elsif ($_=~/File/){
 		($b,$c)=($_=~/GT-A\|(.*?)[| ].*\((\d+)/);
 		$hash{$a}{$b}=$c;
 	}

@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
 library(ggplot2)
-data <- read.csv("a")
+data <- read.csv(args[1])
 print(data)
 # data <- as.double(data)
 

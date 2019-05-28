@@ -26,6 +26,7 @@ $new=Bio::SeqIO->new(-file=>$ARGV[1], -format=>"fasta");
 
 while($seq=$new->next_seq){
   $i=$seq->id;
+  $d=$seq->desc;
   # $i=~s/\.[0-9]+$//g;
   # print $i;
   # $i=~s/[A-Z]$//;
@@ -41,7 +42,7 @@ while($seq=$new->next_seq){
   # if(defined $id_hash{$a[1]} && (!(defined($print_hash{$a[1]})))){
   # if($i=~/GT78/){
   # if ($i=~/^consensus/){
-    print ">$id_hash{$i}\n$s\n";
+    print ">$id_hash{$i} $d\n$s\n";
     # print ">$id_hash{$b[3]}\n$s\n";
   	# $print_hash{$a[1]}=1;
 

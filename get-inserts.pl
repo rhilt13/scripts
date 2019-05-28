@@ -58,7 +58,7 @@ foreach $key(sort keys %inserts){
     $i=0;
     foreach $val(@{$inserts{$key}}){
         @a=split(/-/,$val);
-        next if (abs($a[1]-$a[0])<$ARGV[1]);
+        next if (abs($a[1]-$a[0])<=$ARGV[1]);
         $i++;
         $one=$a[0]+$add;
         $two=$a[1]+$add-1;

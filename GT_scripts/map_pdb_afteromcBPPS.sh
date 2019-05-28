@@ -46,7 +46,9 @@ name=$1;
 export name;
 cat pdb_list.mapped|perl -e 'while(<>){chomp;if ($_=~/^[0-9]+$/){$i=$_;$j=0;}else{$j++;system("chn_vsi $ENV{name}_pdb.VSI $j $i -T -skip=W -d2.5 -v -D -pml > $_.pml");}}'
 
-less ${1}_pdb.VSI|grep '^File\|Set\|Group'|grep -v 'Set1:'|cut -f2 -d'/'|cut -f1 -d'_'|uniq|tr '\n' ' '|tr ':' '\n'|awk -F "#" '{print $3,$1}'|sort -n > ../map_pdb_table
+#less ${1}_pdb.VSI|grep '^File\|Set\|Group'|grep -v 'Set1:'|cut -f2 -d'/'|cut -f1 -d'_'|uniq|tr '\n' ' '|tr ':' '\n'|awk -F "#" '{print $3,$1}'|sort -n > ../map_pdb_table
+less $1_pdb.VSI|grep '^File\|Set\|Group'|cut -f2 -d'/'|perl -e '$p=0;$n=0;while(<>){chomp;$_=~s/ //g;$_=~s/#//g;if ($_=~/Set/){if ($n==1){print "\t";$n=0;}$p=1;$_=~s/# //;$_=~s/://;print "$_,";}else{$_=~s/.pdb\:/-/;if ($p==1){print "\n";$p=0;$n=1;print "$_,";}else{print "$_,";$n=1;}}}'|sed 's/,\t/\t/;s/,$//' > ../map_pdb_table
+
 
 for i in `ls *pml`; do less $i|grep -v '^#'|grep 'load(\|cmd.color("bb_color1"\|create("Class_'|perl -e 'while(<>){chomp;if ($_=~/^cmd.load/){($id)=($_=~/\(\"\.\/([0-9a-zA-Z]+)/);print "\n$id";}elsif ($_=~/^cmd.color/){($num,$chain)=($_=~/resi ([0-9-]+) and chain ([A-Z]) /);print "\t$num,$chain";}elsif ($_=~/^cmd.create/){($cl,$res)=($_=~/\(\"(Class_[A-Z])\",\"(.*)\"\)/);$res=~s/ or / /g;print "\t$cl,$res";}}'; done|sed '1d'|sort -u -k1,1 --merge > pdb_list.mapped.details
 
