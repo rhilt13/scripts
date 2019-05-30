@@ -272,6 +272,20 @@ perl ~/rhil_project/GT/scripts/parse_omcbppsSets_hit_list.pl hits_details ~/rhil
 
 ######################################################################################
 
+#omcbpps_analysis.sh without running rungaps from previously categorized ids from rungaps
+
+# Inside the omcbpps output folder
+mkdir sets
+cp <file>_new.mma sets
+cd sets
+tweakcma <file>_new -write
+rm <file>_new.mma
+for i in `ls *Set*cma`; do j=$(cat $i|grep '^>'|cut -f1 -d' '|cut -f2 -d'>');echo $i $j; done|perl -lne '@a=split(/ /,$_);$set=shift(@a);($s)=($set=~/_(Set[0-9])\.cma/);foreach $id(@a){print "$s\t$id";}' > ../set_map_ids
+cd ..
+match.pl ~/GT/gta_revise13/mapping_files/GTSeq-omcmc40Sets.txt 1 set_map_ids 2 '\t' both all > set_map_ids_details
+
+######################################################################################
+
 ## Get a sequence partition lookup table
 
 #perl ~/rhil_project/GT/scripts/temp_match_rungaps_hits.pl fam_num_list list_hits.txt ../CAZy_families/..../fam_num_list ../CAZy_families/..../list_hits.txt > seq_partition_lookup_table
