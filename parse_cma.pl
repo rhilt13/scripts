@@ -237,7 +237,7 @@ if ($ARGV[1] eq 'sel'){
 			$out .= "\$$ct=$len{$id}($prof{$id}):\n";
 			#$out .= ">$seq_id{$id}\n$seq{$id}\n\n";
 			# $out .= ">$id_hash{$fin_id}\n$seq{$id}\n\n";
-			$out .= ">$fin_id $desc_hash{$id}\n$seq{$id}\n\n";
+			$out .= ">$seq_id{$id} $desc_hash{$id}\n$seq{$id}\n\n";
 		}#else{
 			### If need to control for length
 		# 	if ($len{$id} >=210 and $len{$id} < 600){

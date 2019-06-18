@@ -1,0 +1,22 @@
+color gray80, GT*
+color gray3, *Ins
+set ray_opaque_background, off
+set cartoon_side_chain_helper, on
+set cartoon_transparency, 0.5
+set sphere_scale, 0.5
+set cartoon_oval_length , 0.8
+set cartoon_oval_width , 0.2
+set cartoon_loop_radius, 0.1
+set cartoon_rect_length, 1
+set cartoon_rect_width, 0.1
+set line_width, 3
+set stick_radius, 0.15
+set cartoon_gap_cutoff, 0
+bg_color white
+color cyan, *_DXD
+color magenta, *_XED
+color limon, *_Gloop
+color slate, *_XH
+show sticks, *_MechMod
+color salmon, *_MechMod
+color hotpink, *_MechModImp

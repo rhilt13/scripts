@@ -7,7 +7,11 @@ open(IN,$ARGV[0]);
 while(<IN>){
 	chomp;
 	$_=~s/\s+$//g;
-	if ($_=~/<\/a>$/){
+	if ($_=~/<td id="separateur2">&nbsp;/){
+		if ($_!~/<td id="separateur2">&nbsp; *<\/td>/){
+			($protName)=($_=~/&nbsp;(.*?)<\/td>/);
+		}
+	}elsif ($_=~/<\/a>$/){
 		if ($_=~/ncbitaxid/){
 			($sp)=($_=~/\"ncbitaxid\">(.*)<\/a>/);
 		}else{
@@ -27,13 +31,13 @@ while(<IN>){
 			$id=~s/<br>/\t/g;
 			$id_map.="$ARGV[0]\t$id\n";
 			$first=shift @a;
-			$all_list .="$name[0]\tmain\t$sp\t$first\n";
+			$all_list .="$name[0]\t$protName\tmain\t$sp\t$first\n";
 			foreach $i(@a){
-				$all_list .="$name[0]\t-\t$sp\t$i\n";
+				$all_list .="$name[0]\t$protName\t-\t$sp\t$i\n";
 			}
 		}else{
-			$id_map.="$name[0]\t$id\n";
-			$all_list .= "$name[0]\tmain\t$sp\t$id\n";
+			$id_map.="$name[0]\t$protName\t$id\n";
+			$all_list .= "$name[0]\t$protName\tmain\t$sp\t$id\n";
 		}
 
 	}

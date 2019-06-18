@@ -1,5 +1,7 @@
 #! /usr/bin/env python
 
+# Ver: 1.0
+
 import sys
 from Bio.PDB import PDBParser
 
