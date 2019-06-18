@@ -42,13 +42,14 @@ while($seq=$new->next_seq){
   # if(defined $id_hash{$a[1]} && (!(defined($print_hash{$a[1]})))){
   # if($i=~/GT78/){
   # if ($i=~/^consensus/){
-    print ">$id_hash{$i} $d\n$s\n";
+#    print ">$id_hash{$i} $d\n$s\n";
+    print ">$id_hash{$i}\n$s\n";
     # print ">$id_hash{$b[3]}\n$s\n";
   	# $print_hash{$a[1]}=1;
 
   # print ">human_".$b[3]."|$id_hash{$b[3]}\n$s\n";
   	# print ">GT-A|consensus\n$s\n";
-  }else{
-    print ">$i\n$s\n";
+#  }else{
+#    print ">$i\n$s\n";
   }
 }
