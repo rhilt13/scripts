@@ -191,7 +191,7 @@ if ($ARGV[1] eq 'sel'){
   		# @a=split(/\./,$_);
   		# print "$a[0]\n";
 		$id_hash{$_}=1;
-		$id_hash{$_}=$_;
+		# $id_hash{$_}=$_;
   		# $id_hash{$a[0]}=$_;
 	}
 	# print Dumper(\%id_hash);
