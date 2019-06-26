@@ -5,7 +5,7 @@
 # $ARGV[0]: Temporary file "a" generated as above
 # $ARGV[1]: File with IC description.
 
-$num=-1;
+$num=0;
 open(IN,$ARGV[0]);
 while(<IN>){
 	chomp;
@@ -24,7 +24,7 @@ while(<IN2>){
 	if ($_=~/\+/){
 		chomp;
 		@b=split(/\+/,$_);
-		$out="";
+		$out=""; 
 		foreach $n(@b){
 			$out.=$hash{$n}."+";
 		}

@@ -40,7 +40,7 @@ while($seq=$new->next_seq){
   #if(defined $id_hash{$seq->id}){
   #if(defined $id_hash{$i}){
   # if(defined $id_hash{$i} && !defined $rep{$i}){  # remove sequences with duplicate genbank IDs
-  if(defined $id_hash{$a[1]}){	# remove sequences with duplicate genbank IDs
+  if(defined $id_hash{$a[0]}){	# remove sequences with duplicate genbank IDs
   # if ($id=~/GT12/){
     $rep{$i}=1;
     print ">$i $d\n$s\n";

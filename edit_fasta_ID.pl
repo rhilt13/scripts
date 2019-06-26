@@ -37,13 +37,15 @@ while($seq=$new->next_seq){
 #  $a=($i=~/^>(.*?)\|/);
 #  print "$i\n";
 #  print "$b[3]\n";
-  if(defined $id_hash{$i}){
+  # $fid=$b[3];
+  $fid=$i;
+  if(defined $id_hash{$fid}){
   # if(defined $id_hash{$b[3]}){
   # if(defined $id_hash{$a[1]} && (!(defined($print_hash{$a[1]})))){
   # if($i=~/GT78/){
   # if ($i=~/^consensus/){
 #    print ">$id_hash{$i} $d\n$s\n";
-    print ">$id_hash{$i}\n$s\n";
+    print ">$id_hash{$fid}\n$s\n";
     # print ">$id_hash{$b[3]}\n$s\n";
   	# $print_hash{$a[1]}=1;
 

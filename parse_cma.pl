@@ -16,7 +16,9 @@ use Data::Dumper;
 # $ARGV[1]
 #	=	fa 		:print fasta sequence
 #	=	len 	:filter sequences by length of aligned positions
-#				$ARGV[2]=minimum length; $ARGV[3]=maximum length
+#				$ARGV[2] = minimum length; 
+# 							$ARGV[3]=maximum length
+#						 = auto; (Uses prifle length *0.6 as lower and *10 as upper cutoff to include sequences)
 #				$search for line with /change length/ and change min and max length
 #	=	sel 	:print selected sequences
 #				$ARGV[2] = input list of seq id (no >) (matches full ID)
@@ -192,7 +194,7 @@ if ($ARGV[1] eq 'sel'){
   		# print "$a[0]\n";
 		$id_hash{$_}=1;
 		# $id_hash{$_}=$_;
-  		# $id_hash{$a[0]}=$_;
+  		# $id_hash{$a[3]}=$_;
 	}
 	# print Dumper(\%id_hash);
 	foreach $id(sort { $a <=> $b } keys(%len)){
@@ -202,6 +204,7 @@ if ($ARGV[1] eq 'sel'){
 		# print "$a[1]\n";
 		# if (defined $id_hash{$a[1]} && (!(defined($print_hash{$seq_id{$id}})))){
 		$fin_id=$seq_id{$id};
+		# $fin_id=$a[3];
 		# print "***$fin_id\n";
 		if (exists ($ARGV[3])){
 			if ($ARGV[3] eq 'genbank'){	# Specific for CAZy idedit sequences
@@ -220,9 +223,11 @@ if ($ARGV[1] eq 'sel'){
 				# print "$test_id\n";
 			}
 		}else {
-			@b=split(/ /,$fin_id);
-			# print "$b[0]\n";
-			$test_id=$b[0];
+			# @b=split(/ /,$fin_id);
+			# $test_id=$b[0];
+
+			@b=split(/\|/,$fin_id);
+			$test_id=$b[3];
 			# $id_hash{$fin_id}=1;
 			# print "===$fin_id\t$test_id\n";
 		}
@@ -312,15 +317,16 @@ if ($ARGV[1] eq 'unsel'){
   		$_=~s/^\s+//;
   		$_=~s/\s+$//;
   		## If need to split id
-  		# @a=split(/\t/,$_);
+  		# @a=split(/\|/,$_);
   		# $id_hash{$a[2]}=$a[1];
   		# @a=split(/\./,$_);
-  		# $id_hash{$a[0]}=1;
+  		# $id_hash{$a[3]}=1;
   		$id_hash{$_}=1;
 	}
 	$ct=0;
 	foreach $id(sort { $a <=> $b } keys(%len)){
 		# @a=split(/\|/,$seq_id{$id});
+		# $seq_id{$id}=$a[3];
 		if (exists $seq_id_orig{$id} && defined $id_hash{$seq_id_orig{$id}}){
 			$seq_id{$id}=$seq_id_orig{$id};
 		}
@@ -398,6 +404,19 @@ if ($ARGV[1] eq 'len'){
 		# 	$out .= "\$$ct=$len{$id}($prof_len):\n";
 		# 	$out .= ">$seq_id{$id}\n$seq{$id}\n\n";
 		# }else{
+		if ($ARGV[2]=~/auto/){
+			$lowerLim=$prof_len*0.6;
+			$upperLim=$prof_len*10;
+			if ($aligned_ct{$id} >= $lowerLim and $aligned_ct{$id} < $upperLim){
+				$ct++;
+				$out .= "\$$ct=$len{$id}($prof_len):\n";
+				$out .= ">$seq_id{$id}";
+				if (exists $desc_hash{$id}){
+					$out .=" $desc_hash{$id}";
+				}
+				$out .="\n$seq{$id}\n\n";
+			}
+		}else{
 			if ($aligned_ct{$id} >= $ARGV[2] and $aligned_ct{$id} < $ARGV[3]){		# change length
 				$ct++;
 				$out .= "\$$ct=$len{$id}($prof_len):\n";
@@ -406,7 +425,7 @@ if ($ARGV[1] eq 'len'){
 					$out .=" $desc_hash{$id}";
 				}
 				$out .="\n$seq{$id}\n\n";
-			# }
+			}
 		}
 	}
 	print "$sep1_1$ct$sep1_2\n$sep2\n";
@@ -457,19 +476,26 @@ if ($ARGV[1] eq 'editID'){
   		# print "$a[0]\n";
 	}
 	foreach $id(sort { $a <=> $b } keys(%len)){
-		$ct++;
-		$out .= "\$$ct=$len{$id}($prof{$id}):\n";
 		# print "$id\t$seq_id{$id}\t$id2{$seq_id{$id}}\t$seq_id_orig{$id}\n";
-		if (exists $new_ID{$seq_id{$id}}){		### Specify match unmatch here
-			$out .= ">$new_ID{$seq_id{$id}} $desc_hash{$id}\n$seq{$id}\n\n";
-		}elsif (exists $new_ID{$id2{$seq_id{$id}}}){
-			$out .= ">$new_ID{$id2{$seq_id{$id}}} $desc_hash{$id}\n$seq{$id}\n\n";
-		}elsif (exists $new_ID{$id2{$seq_id_orig{$id}}}){
-			$out .= ">$new_ID{$id2{$seq_id_orig{$id}}} $desc_hash{$id}\n$seq{$id}\n\n";
-		}elsif (exists $new_ID{$seq_id_orig{$id}}){
-			$out .= ">$new_ID{$seq_id_orig{$id}} $desc_hash{$id}\n$seq{$id}\n\n";
-		}else{
-			$out .= ">$seq_id{$id} $desc_hash{$id}\n$seq{$id}\n\n";
+		
+		# Temporary for editing Genbank Ids with gi numbers
+		@c=split(/\|/,$seq_id{$id});
+		# print "$c[3]\t$new_ID{$c[3]\n";
+		if (exists $new_ID{$c[3]}){		### Specify match unmatch here
+			$ct++;
+			$out .= "\$$ct=$len{$id}($prof{$id}):\n";
+			$out .= ">$new_ID{$c[3]}\n$seq{$id}\n\n";
+		
+#		if (exists $new_ID{$seq_id{$id}}){		### Specify match unmatch here
+#			$out .= ">$new_ID{$seq_id{$id}} $desc_hash{$id}\n$seq{$id}\n\n";
+#		}elsif (exists $new_ID{$id2{$seq_id{$id}}}){
+#			$out .= ">$new_ID{$id2{$seq_id{$id}}} $desc_hash{$id}\n$seq{$id}\n\n";
+#		}elsif (exists $new_ID{$id2{$seq_id_orig{$id}}}){
+#			$out .= ">$new_ID{$id2{$seq_id_orig{$id}}} $desc_hash{$id}\n$seq{$id}\n\n";
+#		}elsif (exists $new_ID{$seq_id_orig{$id}}){
+#			$out .= ">$new_ID{$seq_id_orig{$id}} $desc_hash{$id}\n$seq{$id}\n\n";
+#		}else{
+#			$out .= ">$seq_id{$id} $desc_hash{$id}\n$seq{$id}\n\n";
 		}
 	}
 	print "$sep1_1$ct$sep1_2\n$sep2\n";
