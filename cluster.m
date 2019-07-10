@@ -1,3 +1,9 @@
+%%
+cd ('~/GT/gta_revise13/analysis/machine_learning/results/mechanism/fullSeq_run1')
+%%
+mat=[[1 2 3];[4 5 6];[7 8 9]]
+corrcoef(mat)
+%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%% Reading in the data tables
 %% Read in a correlation matrix
@@ -6,8 +12,8 @@ T = readtable('p.txt');
 A = table2array(T);
 %% Read in a table of features
 % T=readtable('GT_Mechanism_Feature_NoNA.csv');
-% T=readtable('GTA_Mechanism_FullSeq_Features_NoNA.csv');
-T=readtable('features_gt6.csv');
+T=readtable('GTA_Mechanism_FullSeq_Features_NoNA.csv');
+%T=readtable('features_gt6.csv');
 %%
 T1=T;
 T1.GTFam=[];
@@ -73,7 +79,22 @@ writetable(cell2table(Sel2),'features_corr.txt');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%% Clustering
 %%
-Z = linkage(A,'average','chebychev');
+% R2=R;
+R(~any(~isnan(R), 2),:)=[];
+R(:,~any(~isnan(R), 2))=[];
+%%
+% Z = linkage(R,'average','chebychev');
+Z=linkage(R,'complete','correlation');
+%Z = linkage(R);
+%%
+B=A';
+%%
+Z=linkage(B,'complete','correlation');
+groups = cluster(Z,'cutoff',1,'criterion','distance');
+%%
+dendrogram(Z,0,'colorthreshold',1.5)
+%%
+writecsv(groups,'features_all_groups_1.txt');
 %%
 C = cluster(Z,'maxclust',20);
 %%
