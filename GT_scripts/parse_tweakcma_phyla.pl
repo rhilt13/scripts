@@ -6,11 +6,10 @@
 # cat ../../profile/order |cat -n|sed 's/^ \+//g' > map_fam_info
 
 # Input (generate from above):
-# $ARGV[0] = map_fam_info
-# $ARGV[1] = *_tax.raw.e1
+# $ARGV[0] = *_tax.raw.e1
 
 # Run:
-# parse_tweakcma_phyla.pl map_fam_info gta_rev12_rungaps_tax.raw.e1 > gta_rev12_rungaps_tax.raw.e1.table
+# parse_tweakcma_phyla.pl gta_rev12_rungaps_tax.raw.e1 > gta_rev12_rungaps_tax.raw.e1.table
 
 # open(IN,"$ARGV[0]");
 # while(<IN>){
@@ -19,7 +18,7 @@
 # 	push(@famList,$n[1]);
 # 	$hash{$n[0]}=$n[1];
 # }
-open(IN2,"$ARGV[1]");
+open(IN2,"$ARGV[0]");
 while(<IN2>){
 	# print $_;
 	chomp;
@@ -30,18 +29,22 @@ while(<IN2>){
 	# 	# print "$_\t--$fam_num\n";
 	# 	$fam=$fam_num;
 	# 	push (@famList,$fam);
-	# if($_=~/^nrtx/){		# For new nrtx sets
-	# 	($fam_num)=($_=~/nrtx.pID_([0-9]+)\.nocsq/);	#RunGaps Change based on where the family name/num is 
-	# 	$fam=$fam_num;
-	# 	push (@famList,$fam);
+	
+	if($_=~/^nrtx/){		# For new nrtx sets
+		($fam_num)=($_=~/nrtx.pID_(Set[0-9]+)\./);	#RunGaps Change based on where the family name/num is 
+		$fam=$fam_num;
+		push (@famList,$fam);
+	
 	# if($_=~/^nr_rev/){		# For new omcBPPS sets
 	# 	($fam_num)=($_=~/sel3_new_(Set[0-9]+)\.cma/);	#OmcBPPS Change based on where the family name/num is 
 	# 	$fam=$fam_num;
 	# 	push (@famList,$fam);
-	if($_=~/^GT/){		# For new omcBPPS sets
-		($fam_num)=($_=~/^(.*?)\.merged/);	#Rungaps, main fam combined
-		$fam=$fam_num;
-		push (@famList,$fam);
+	
+	# if($_=~/^GT/){			# For rungaps from GT families
+	# 	($fam_num)=($_=~/^(.*?)\.merged/);	#Rungaps, main fam combined
+	# 	$fam=$fam_num;
+	# 	push (@famList,$fam);
+	
 	}elsif($_=~/^==/){
 		$_=~s/=//g;
 		@a=split(/ /,$_);

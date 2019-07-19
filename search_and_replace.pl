@@ -2,6 +2,13 @@
 
 use Data::Dumper;
 use Bio::SeqIO;
+# use String::Substitution qw( sub_modify );
+
+# v1.0
+# Date: Jul 19, 2019
+
+# Example Run
+# search_and_replace.pl mapFile fileToReplace t
 
 open(IN,$ARGV[0]);	# Index file with ID and map
 while(<IN>){
@@ -12,6 +19,7 @@ while(<IN>){
 	$hash{$a[0]}=$a[1];
 }
 
+# print Dumper(\%hash);
 open(IN2,$ARGV[1]);		# Tab separated files
 while(<IN2>){
 	chomp;
@@ -31,10 +39,12 @@ while(<IN2>){
 			print "$_\n";
 		}
 	}else{
-		foreach $key(%hash){
-			$_=~s/$key/$hash{$key}/;
+		foreach $key(sort keys %hash){
+			# print "$key\t$hash{$key}\n";
+			# sub_modify($_, $key, $hash{$key});
+			$_=~ s/$key/$hash{$key}/g;
 		}
-		print $_;
+		print "$_\n";
 	}
 }
 

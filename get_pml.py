@@ -229,7 +229,9 @@ def main(args):
 			if pdb_ch in ins and ins[pdb_ch] != 'None':
 				out+="cmd.select(\""+gtpdb+"Ins\",\""+gtpdb+" and resi "+ins[pdb_ch]+"\")\n"
 				out+="cmd.color(\"gray3\",\""+gtpdb+"Ins\")\n"
-
+			else:
+				print gtpdb,pdb_ch,ins[pdb_ch]
+				out+="cmd.select(\""+gtpdb+"Ins\",\""+gtpdb+" and resi 100000\")\n"
 			# Map domains
 			for d in mapped_dom:
 				if pdb in mapped_dom[d]:

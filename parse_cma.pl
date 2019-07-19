@@ -58,6 +58,7 @@ use Data::Dumper;
 #				$ARGV[3] (optional) = SkipZero: Skips sequences with gaps in all selected positions
 #									= PrintAll: Prints all sequences regardless of zero length.
 #									Default: Errors and dies if sequence length of zero found.
+#   =   <any option> : $ARGV[-1] = 'edit-dup'; => If last argument is edit-dup, changes duplicate IDs by adding _<int> 
 
 # Example run:
 # perl ~/rhil_project/scripts/parse_cma.pl d102.d104_not.cma unsel tempb
@@ -102,7 +103,7 @@ while(<IN>){
 			$seq_id_back{$main_id}=$id; # Changed for order option;Takes id with description separate only id for key
 		}
 		# $seq_id{$id}=$_;
-		if (exists $repeat{$main_id}){
+		if (exists $repeat{$main_id} && $ARGV[-1]=~/edit-dup/){
 			$dup_num{$main_id}++;
 			$seq_id{$id}=$main_id."_".$dup_num{$main_id};
 			$seq_id_orig{$id}=$main_id;
@@ -225,9 +226,9 @@ if ($ARGV[1] eq 'sel'){
 		}else {
 			# @b=split(/ /,$fin_id);
 			# $test_id=$b[0];
-
-			@b=split(/\|/,$fin_id);
-			$test_id=$b[3];
+			# @b=split(/\|/,$fin_id);
+			# $test_id=$b[3];
+			$test_id=$fin_id;
 			# $id_hash{$fin_id}=1;
 			# print "===$fin_id\t$test_id\n";
 		}
