@@ -51,15 +51,14 @@ hide labels
 alter gt_domain, resi=str(int(resi)-144)
 sort
 ###############
-
-align target, template
-align 1h7q, 2z86_CHS
-
-##############
 ## Align 2 structures
 super mover_id target_id
 align mover_id target_id
 cealign target_id mover_id
+
+## Align multiple structures to generate similarity matrix
+run ~/git/scripts/align_all_to_all.py
+align_all_to_all object_list=name1 name2 name3 name4, full_matrix=1, method=cealign
 
 ##############
 ## Mover structures around manually
@@ -104,3 +103,7 @@ order 1frg, location=top
 
 set valence, 0
 set cartoon_gap_cutoff, 0
+
+## Import python scripts into pymol to run them
+run <full_path_to_python_script>.py
+<python_script>

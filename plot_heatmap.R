@@ -13,8 +13,9 @@ mat_data <- data.matrix(data[,2:ncol(data)])
 rownames(mat_data) <- rnames 
 # colnames(mat_data) <- cnames 
 # print (cnames)
-distance = dist(mat_data, method = "euclidian")
-# print(distance)
+# distance = dist(mat_data, method = "euclidian")
+distance=as.dist(mat_data)
+print(distance)
 cluster = hclust(distance, method = "ward")
 
 # heatmap(mat_data)
