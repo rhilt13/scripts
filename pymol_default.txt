@@ -19,3 +19,16 @@ color slate, *_XH
 show sticks, *_MechMod
 color salmon, *_MechMod
 color hotpink, *_MechModImp
+
+set cartoon_oval_length , 0.6
+set cartoon_oval_width , 0.1
+set cartoon_loop_radius, 0.07
+
+# Hypho core view:
+set_view (\
+     0.405783147,   -0.051343918,    0.912441194,\
+     0.782367110,    0.535509884,   -0.317775041,\
+    -0.472346455,    0.842881382,    0.257472456,\
+     0.000453170,    0.000997225, -121.667617798,\
+    16.632604599,   -5.618785381,   -4.815418243,\
+   -31.142610550,  272.799652100,  -20.000000000 )
