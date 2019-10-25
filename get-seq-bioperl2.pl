@@ -8,7 +8,7 @@ open(IN,$ARGV[0]);
 while(<IN>){
   chomp $_;
   $_=~s/^\s+|\s+$//g;
-  $id_hash{$_}=1;
+  # $id_hash{$_}=1;
   # @a=split(/\t/,$_);
   # $id_hash{$a[1]}=1;
   # $fam{$a[1]}=$a[0];
@@ -16,7 +16,8 @@ while(<IN>){
   #   $a[4]=~s/locus://;
   #   $locus{$a[1]}=$a[4];
   # }
-#  $id_hash{$_}=1;
+  $qry=$_;
+  $id_hash{$qry}=1;
 }
 
 # # print Dumper(\%id_hash);
@@ -30,6 +31,8 @@ while($seq=$new->next_seq){
   $s=$seq->seq;
   $i=~s/^\s+|\s+$//g;
   @a=split(/\|/,$i);
+  # $srch=$i;
+  $srch=$a[1];
 #  $a[1]=~s/\.[0-9]+$|//g;
   # print $a[1];
   # ($id)=($seq->id=~/(\S+):/);
@@ -40,7 +43,7 @@ while($seq=$new->next_seq){
   #if(defined $id_hash{$seq->id}){
   #if(defined $id_hash{$i}){
   # if(defined $id_hash{$i} && !defined $rep{$i}){  # remove sequences with duplicate genbank IDs
-  if(defined $id_hash{$a[0]}){	# remove sequences with duplicate genbank IDs
+  if(defined $id_hash{$srch}){	# remove sequences with duplicate genbank IDs
   # if ($id=~/GT12/){
     $rep{$i}=1;
     print ">$i $d\n$s\n";

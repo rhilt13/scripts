@@ -2,7 +2,7 @@
 
 use Data::Dumper;
 
-# Ver: 1.0.0
+# Ver: 1.1.0
 # Started versioning after adding the sel-pos option
 
 # works only if you wish to print a single cma file
@@ -62,6 +62,12 @@ use Data::Dumper;
 
 # Example run:
 # perl ~/rhil_project/scripts/parse_cma.pl d102.d104_not.cma unsel tempb
+
+## Bugs to fix:
+# unsel option can't handle duplicate IDs even with edit-IDs option
+
+# Log:
+# 1.1.0 -> Replaced all cases of direct_seq which was printing wrong seq for ids
 
 # sub warn {   
 # 	no warnings 'once';
@@ -216,7 +222,7 @@ if ($ARGV[1] eq 'sel'){
 				$test_id=$a[0];
 			}elsif ($ARGV[3] eq 'nrtx'){
 				$seq_id{$id}=$main_id;
-				$$desc_hash{$id}=$desc_id;
+				$desc_hash{$id}=$desc_id;
 				($test_id)=($desc_hash{$id}=~/<([A-Za-z ]+?)\([ABEFMV]\)>/);
 				if ($test_id=~/viruses/){
 					$test_id="Virus";
@@ -240,10 +246,12 @@ if ($ARGV[1] eq 'sel'){
 			# print "$fin_id\n";
 			$print_hash{$test_id}=1;
 			$ct++;
-			$out .= "\$$ct=$len{$id}($prof{$id}):\n";
-			#$out .= ">$seq_id{$id}\n$seq{$id}\n\n";
-			# $out .= ">$id_hash{$fin_id}\n$seq{$id}\n\n";
-			$out .= ">$seq_id{$id} $desc_hash{$id}\n$seq{$id}\n\n";
+			$out .= "\$$ct=$len{$id}($prof_len):\n";
+			$out .= ">$seq_id{$id}";
+			if (exists $desc_hash{$id}){
+				$out .=" $desc_hash{$id}";
+			}
+			$out .="\n$seq{$id}\n\n";
 		}#else{
 			### If need to control for length
 		# 	if ($len{$id} >=210 and $len{$id} < 600){
@@ -270,8 +278,8 @@ if ($ARGV[1] eq 'sel-man'){
 	$ct=0;
 	foreach $id(sort { $a <=> $b } keys(%len)){
 		# if ($seq_id{$id} =~/GT2-A/ || $seq_id{$id} =~/GT27-A/ || $seq_id{$id} !~/GT2-A/){		### Specify match unmatch here
-		 if ($seq_id{$id} =~/\Q$ARGV[2]/){		### Specify match unmatch here
-		# if ($seq_id{$id} !~/consensus/){		### Specify match unmatch here
+		# if ($seq_id{$id} =~/\Q$ARGV[2]/){		### Specify match unmatch here)
+		if ($seq_id{$id} !~/consensus/){		### Specify match unmatch here)
 		# if ($seq_id{$id} =~/GT16-u/){		### Specify match unmatch here
 			$ct++;
 			$out .= "\$$ct=$len{$id}($prof{$id}):\n";
@@ -331,8 +339,8 @@ if ($ARGV[1] eq 'unsel'){
 		if (exists $seq_id_orig{$id} && defined $id_hash{$seq_id_orig{$id}}){
 			$seq_id{$id}=$seq_id_orig{$id};
 		}
-		if (!(defined $id_hash{$seq_id{$id}}) && (!(defined($print_hash{$seq_id{$id}})))){
-		# if (!(defined $id_hash{$seq_id{$id}})){
+		# if (!(defined $id_hash{$seq_id{$id}}) && (!(defined($print_hash{$seq_id{$id}})))){
+		if (!(defined $id_hash{$seq_id{$id}})){
 			$ct++;
 			$print_hash{$seq_id{$id}}=1;
 			$out .= "\$$ct=$len{$id}($prof_len):\n";
@@ -340,7 +348,8 @@ if ($ARGV[1] eq 'unsel'){
 			if (exists $desc_hash{$id}){
 				$out .=" $desc_hash{$id}";
 			}
-			$out .="\n$direct_seq{$seq_id{$id}}\n\n";
+			# $out .="\n$direct_seq{$seq_id{$id}}\n\n";
+			$out .="\n$seq{$id}\n\n";
 		}#else{
 			## If need to control for length of sequences
 		# 	if ($len{$id} >=210 and $len{$id} < 600){
@@ -521,7 +530,11 @@ if ($ARGV[1] eq 'rem-first'){
 		if ($id != 1){		### Specify match unmatch here
 			$ct++;
 			$out .= "\$$ct=$len{$id}($prof{$id}):\n";
-			$out .= ">$seq_id{$id} $desc_hash{$id}\n$seq{$id}\n\n";
+			$out .= ">$seq_id{$id}";
+			if (exists $desc_hash{$id}){
+				$out .=" $desc_hash{$id}";
+			}
+			$out .="\n$seq{$id}\n\n";
 		}
 	}
 	print "$sep1_1$ct$sep1_2\n$sep2\n";
@@ -538,7 +551,11 @@ if ($ARGV[1] eq 'rename-dup'){
 		# print "$id\n";
 		$ct++;
 		$out .= "\$$ct=$len{$id}($prof_len):\n";
-		$out .= ">$seq_id{$id} $desc_hash{$id}\n$seq{$id}\n\n";
+		$out .= ">$seq_id{$id}";
+		if (exists $desc_hash{$id}){
+			$out .=" $desc_hash{$id}";
+		}
+		$out .="\n$seq{$id}\n\n";
 	}
 	print "$sep1_1$ct$sep1_2\n$sep2\n";
 	print $out;
@@ -554,7 +571,11 @@ if ($ARGV[1] eq 'rem-dup'){
 			$ct++;
 			$print_hash{$seq_id{$id}}=1;
 			$out .= "\$$ct=$len{$id}($prof_len):\n";
-			$out .= ">$seq_id{$id} $desc_hash{$id}\n$direct_seq{$seq_id{$id}}\n\n";
+			$out .= ">$seq_id{$id}";
+			if (exists $desc_hash{$id}){
+					$out .=" $desc_hash{$id}";
+			}
+			$out .="\n$seq{$id}\n\n";
 		}
 	}
 	print "$sep1_1$ct$sep1_2\n$sep2\n";
@@ -727,6 +748,9 @@ if ($ARGV[1] eq 'sel-pos'){
 				}
 			}elsif ($res=~/[{}()*]/){
 				$shortSeq.=$res;
+			}elsif ($res=~/[a-z]/ && $ARGV[4]=~/sel-region/){
+				$shortSeq.=$res;
+				$seq_len++;
 			}
 			# print "$pos\t$res\t$shortSeq\n";
 		}
@@ -734,7 +758,7 @@ if ($ARGV[1] eq 'sel-pos'){
 			if (!exists $ARGV[3]){
 				print "ERROR: Sequence of length 0 encountered\n";
 				print "Seq Num:$ct; ID: $seq_id{$id} $desc_hash{$id}\n$shortSeq\n";
-				print "Add 4th option:\n\t\"SkipDie\" to skip these sequences.\n\t\"PrintAll\" to print all sequences.\n";
+				print "Add 4th option:\n\t\"SkipZero\" to skip these sequences.\n\t\"PrintAll\" to print all sequences.\n";
 				die;
 			}elsif ($ARGV[3]=~/SkipZero/){
 				next;

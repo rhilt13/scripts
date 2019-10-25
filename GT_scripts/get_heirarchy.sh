@@ -532,11 +532,14 @@ for i in `ls CAZy_allGT_genbank.faa.IDedit_2[0-3].cma`; do head -603 $i >> cazy_
 # edit to remove cma partitions to merge as a single cma file
 
 
+
+##########################################################
+search_cdd.pl < gt2-gt25Met-1 > gt2-gt25Met-1.cdd
 ##########################################################
 
 ## change cma to fa
 cma2fa cazy_pdb.p90.l100 >cazy_pdb.p90.l100.fa
-cat cazy_pdb.p90.l100.fa|perl -lne 'if ($_!~/^>/){$_=~s/-//g;print $_;}else{print $_;}'> a
+cat cazy_pdb.p90.l100.fa|perl -lne 'if ($_!~/^>/){$_=~s/-//g;pri nt $_;}else{print $_;}'> a
 tail -n+4 a > b
 cat b new_seq.fa > c
 
@@ -546,7 +549,7 @@ gismo++ new_aln.fa -fast
 ##########################################################
 ## Keep only aligned positions froma  cma file in fasta format
 
-less seq_set1.fa_aln.cma|perl -lne 'if ($_=~/^>/){print $_;}elsif ($_=~/^\{/){$_=~s/[a-z{}()*]//g;print $_;}'|less
+less seq_set1.fa_aln.cma|perl -lne 'if ($_=~/^>/){print $_;}elsif ($_=~/^\{/){$_=~s/[a-z{}()*]//g;$_=uc($_);print $_;}'|less
 ##########################################################
 
 # Find out which omcBPPS sets contain a pdb file
@@ -706,7 +709,9 @@ less sets/map_fam_info |perl -e 'while(<>){@a=split(/ /,$_);$hash{$a[0]}=$a[1];}
 ## Find pdb files that have UDP substrates in them.
 for i in `ls pdb_map/*.pml|sed 's/_[A-Z].pml$//'|sort -u`; do j=$(cat $i|grep HETATM|grep -v HOH|grep UDP);echo $i $j; done|grep UDP|cut -f1 -d' ' > yes_substrates
 
-
+#####################################################
+# Get set assignments after omcbpps
+less all_gta_new.mma|perl -e 'while(<>){chomp;if ($_=~/^\[/){($set)=($_=~/=(Set[0-9]+)/);}elsif ($_=~/^>/){$_=~s/^>//;$_=~s/ /\t/;print "$set\t$_\n";}}' > sets
 #####################################################
 
 cat human_gt16.fa|tail -1|sed 's/\(.\)/\1\n/g' > temp1
@@ -790,6 +795,11 @@ DATA
 
 ## Load tree and labels in itol
 
+######################################################
+# Parse pHMM matrix to get apirwise distance to a specific profile
+less shorted_names.txt |sed 's/==/\t/' > shorted_names.txt.e1
+less file_dist_matrix_out_phylip.txt|sed 's/ \+/\t/g' > file_dist_matrix_out_phylip.txt.e1
+match.pl shorted_names.txt.e1 2 file_dist_matrix_out_phylip.txt.e1 1 '\t' both|awk -F'\t' '{print $95"\t"$0;}'|cut -f1,3-94 > file_dist_matrix_out_phylip.txt.e2
 ######################################################
 # Map each IDS to rungaps hit profile
 for i in `ls rungaps/pdb/pdb_seqres.txt_{1..100}.cma`; do cat $i|grep '^>'|cut -f1 -d' '|cut -f2 -d'>'; done|perl -lne 'if ($_=~/^GT/){$fam=$_;}else{print "$fam\t$_";}' > rungaps/pdb/pdb_seqres.txt.hits.map
@@ -985,6 +995,17 @@ cat list_diff|awk '{if ($2>$3){print $0,"\t",$2-$3}}'|sort -k4,4nr|less
 # file.hits (Taxonomy Reports > Selct list of hits Copy paste)
 
 less cosmc_PSI2.hits|grep -v 'Next Previous'|grep -v '\]$'|grep -v RecName|cut -f4 > cosmc_hits.ids
+
+############################################################
+## Get taxonomic lineage from a list of sequence IDs genbank
+
+# Create a list of sequence ids => ids
+~/tools/2018-ncbi-lineages/make-acc-taxid-mapping.py ids /auto/share/db/ncbi_taxdump/prot.accession2taxid.gz
+~/tools/2018-ncbi-lineages/make-lineage-csv.py /auto/share/db/ncbi_taxdump/nodes.dmp /auto/share/db/ncbi_taxdump/names.dmp ids.taxid -o <id>-lineage.csv
+
+############################################################
+## Add taxonomy to uniprot sequences
+less uniprot_rev13.merged.cma|perl -e 'open(IN,"/auto/share/db/Uniprot_Ref_Proteomes_180925/proteomes_taxonomy.tab");while(<IN>){chomp;@a=split(/\t/,$_);$hash{$a[2]}=$a[4];}while(<>){chomp;if ($_=~/^>/){($tid)=($_=~/OX=([0-9]+) /); print "$tid\t$hash{$tid}\n";}}'
 
 ############################################################
 ## Caluclate conservation scores for aligned postions and parse output
