@@ -25,6 +25,10 @@ set cartoon_oval_length , 0.6
 set cartoon_oval_width , 0.1
 set cartoon_loop_radius, 0.07
 
+set_color lightorange=[1.00 , 0.79 , 0.1 ]
+set_color orangered=[1.00 , 0.42 , 0.2 ]
+set_color darkorange=[1.00 , 0.5 , 0.0 ]
+
 # Hypho core view:
 set_view (\
      0.405783147,   -0.051343918,    0.912441194,\
