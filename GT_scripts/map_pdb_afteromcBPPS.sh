@@ -37,7 +37,7 @@ mv ../${1}_pdb.klst .
 mv ../${1}_pdb.eval .
 mv ../${1}_pdb.best .
 mv ../${1}.interact .
-mv ../${1}.grph .
+mv ../${1}.grph .download fasttr
 mv ../${1}.key_res .
 mv ../${1}.ca_scores .
 

@@ -58,11 +58,11 @@ while(<IN>){
 	}
 }
 
-# print Dumper(\%connect);
+# qprint Dumper(\%connect);
 if ($ARGV[1]=~/^[0-9]+$/){
 	print "$ARGV[1]\t$hitct=";
 	foreach $k(sort keys %hitmech){
-		print "\n$k($hitmech{$k})|";
+		print "\n$k($hitmech{$k})|";main_atoms = ['N','CA','C','O','CB']
 		foreach $m(sort { $posCt{$k}{$b} <=> $posCt{$k}{$a} } keys(%{$posCt{$k}})){
 			if ($posCt{$k}{$m} > $ARGV[2]){
 				print "$m($posCt{$k}{$m}),";

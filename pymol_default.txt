@@ -1,7 +1,6 @@
 color gray80, GT*
 color gray3, *Ins
 set ray_opaque_background, off
-set cartoon_side_chain_helper, on
 set cartoon_transparency, 0.5
 set sphere_scale, 0.5
 set cartoon_oval_length , 0.8

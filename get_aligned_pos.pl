@@ -10,6 +10,8 @@ $Data::Dumper::Sortkeys = sub { [sort { $a <=> $b } keys %{$_[0]}] };
 # get_aligned_pos.pl <alignment_file> a cons 	# To get aligned position using consensus at top
 # get_aligned_pos.pl <alignment_file> a 	 	# To get aligned position by generating consensus based on gap_tol
 # get_aligned_pos.pl <alignment_file> 		 	# To display consensus sequence
+# get_aligned_pos.pl <alignment_file> 		 	# To display consensus sequence
+
 
 #
 
@@ -118,9 +120,22 @@ if ($ARGV[1]=~/a/){
 		print "\n";
 	}
 }else{
-	print length($cons),"\n",$cons,"\n";
-	$cons=~s/-//g;
-	print length($cons),"\n",$cons,"\n";
+	if ($ARGV[1]=~/^write$/){
+		$fout=$ARGV[0].".cons";
+		$cons_name=$ARGV[0];
+		$cons_name=~s/_seed.fasta/|cons/;
+		open(OUT,'>',"$fout");
+		print OUT ">$cons_name\n$cons\n";
+		open(IN,$ARGV[0]);
+		while(<IN>){
+			print OUT $_;
+		}
+	}else{
+		print length($cons),"\n",$cons,"\n";
+		$cons=~s/-//g;
+		print length($cons),"\n",$cons,"\n";			
+	}
+
 }
 
 # foreach $r(@best_score){
