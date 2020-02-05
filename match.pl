@@ -53,7 +53,6 @@ while(<IN>){
 	}
 }
 #  print Dumper(\%hash);
-
 ## Compare column in 2nd file
 if ($ARGV[3]=~/^[0-9]+$/){
 	$col2=$ARGV[3]-1;

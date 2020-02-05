@@ -1089,6 +1089,14 @@ mv a non_gt2_cts.txt
 # Edit cma file names and concatenate all rungaps hits into a single cma file
 for i in `ls ../../../rungaps/nr/sets/run2_l140Aligned/sets_raw/nr_gtrev12_*.l140_is90_is92.cma`; do j=$(echo $i|rev|cut -f1 -d'/'|rev);k=$(echo $j|cut -f1 -d'.'|cut -f3 -d'_');echo $j $k;export k; cat $i|perl -e 'open(IN,"../../../rungaps/nr/map_fam_info");while(<IN>){chomp;@a=split(/\t/,$_);$hash{$a[0]}=$a[1];}while(<>){if ($_=~/^\[/){$_=~s/nrtx.part-01/$hash{$ENV{k}}/;print "$_";}else{print "$_";}}';  done > gtarev12_rungaps_nr_filtered.cma
 
+############################################################
+# Edit uniprot and nr tables to generate tables and files for the GTA db
+
+match.pl ~/GT/gta_revise13/mapping_files/omcSets_name.txt 1 uniprot/uniprot_table10.fixedCeSputa2 4 '\t' both|awk -F'\t' '{print $1"\t"$2"\t"$3"\t"$4"\t"$17"\t"$5"\t"$6"\t"$7"\t"$8"\t"$9"\t"$10"\t"$11"\t"$12"\t"$13"\t"$14"\t"$15}' > uniprot/uniprot_table11.OmcNames
+cat uniprot/uniprot_table11.OmcNames|cut -f2,3,5,6,8- > uniprot/uniprot_table12.final
+
+############################################################
+
 
 #### 
 # Pymol
@@ -1187,13 +1195,10 @@ grep -f sel_pdb2 out4.pml.pttrnMap|grep -v 'Pt2'|less
 grep -f sel_pdb2 out3.pml.pttrnsMap|grep -v 'Pt2'|cut -f2 -d'"'|perl -lne 'print "create $_","Obj, $_";'|less
 #Copy paste to pymol to create selections within the new objects
 grep -f sel_pdb2 out3.pml.pttrnsMap|grep Pt2|perl -lne '($mech)=($_=~/(_[RIB][a-z]+Pt)[12]"/);$rep=$mech."1";$_=~s/ and/$rep/ee;$_=~s/resi/and resi/;print "$_";'|less
-
+#"
 
 # Copy paste in pymol to get base view for each pdb
 grep -f sel_pdb2 out3.pml.pttrnsMap|cut -f2 -d'"'|cut -f1,2 -d'_'|sort -u|perl -lne 'print "hide everything;set seq_view, 0, *;set seq_view, 1, ",$_,"*;show cartoon, $_;show sticks, ",$_,"_DXD;show sticks, ",$_,"_XED;show sticks, ",$_,"_XH;show ribbon, ",$_,"_Gloop;";'|less
-
-
-
 
 ############################################################
 # Workflow to map aligned cma positions to pdb residue numbering
@@ -1207,6 +1212,42 @@ list-aligned-pos-pdb.pl full ~/GT/pdb/ver_0918_gta/allGT_pdbBounds.txt ~/GT/gta_
 ############################################################
 # Draw weblogo for all 231 positions for all GT-A families
 for i in `ls *short.fa`; do weblogo -D fasta -A protein -s large -X NO --scale-width NO --errorbars NO -C black AVLIPWMF 'nonpolar' -C blue HRK 'basic' -C purple NQ 'amides' -C green GYSTC 'polar' -C red DE 'acidic' -y ' ' -P' ' -f $i --logo-font Arial-BoldMT -o $i.eps -l 1 -u 231 -n 240; done
+############################################################
+## Match ortholog list forma database to KinOrtho workflow
+# Get Ortholog count for a databse
+cat OF2_BLAST_MSA_HumanPKD.list_all|cut -f1|sort|uniq -c|sed 's/^ \+//g;s/ /\t/' > OF2_BLAST_MSA_HumanPKD.list_all.count
+# compare oveall ortholog counts for each kinase
+match.pl OF2_BLAST_MSA_HumanPKD.list_all.count 2 ../HumanPKD_Ortholog.counts.e2.all_fullLength_kinDom 1 '\t' both all|sed 's/==NO MATCH/-\t-/g'|cut -f1-5 > OF2_CompareCounts
+# Compare ortholog matches with all KinOrtho orthologs (kinase domain + full length)
+
+#################
+## In script: /home/rtaujale/kannan_projects/kinview_Orthologs/databases/EggNOG_5.0_Fine-grained-.239.rels.raw EG
+
+# Get all Human PKDs from the database
+match.pl ../HumanPKD.ids 1 $1 1 '\t' > ${2}_HumanPKD.list1   
+match.pl ../HumanPKD.ids 1 $1 2 '\t'|awk -F'\t' '{print $2"\t"$1}' > ${2}_HumanPKD.list2
+
+# Make list of all pairs
+cat OF2_BLAST_MSA_HumanPKD.list_all ../HumanPKD_RBH_QfO_2011.txt.e1.all.noself_nodups|sort -u > OF2_KinOrtho.allPairs
+
+# Match all pairs list with KinOrtho orthologs
+match.pl ../HumanPKD_RBH_QfO_2011.txt.e1.all.noself_nodups 1,2 OF2_KinOrtho.allPairs 1,2 '\t' b all|perl -lne 'if ($_=~/NO MATCH/){$_=~s/==NO MATCH/No/g;print $_;}else{print "$_\tYes";}' > OF2_KinOrtho.allPairs.e1.KinOrthoAll
+# Match all pairs list with KinOrtho full length orthologs
+match.pl ../HumanPKD_RBH_QfO_2011.txt.e2.fullLength.noself_nodups 1,2 OF2_KinOrtho.allPairs.e1.KinOrthoAll 1,2 '\t' b all|perl -lne 'if ($_=~/NO MATCH/){$_=~s/==NO MATCH/No/g;print $_;}else{print "$_\tYes";}' > OF2_KinOrtho.allPairs.e2.KinOrthoFullLength
+# Match all pairs list with KinOrtho kinase domain orthologs
+match.pl ../HumanPKD_RBH_QfO_2011.txt.e2.kinDom.noself_nodups 1,2 OF2_KinOrtho.allPairs.e2.KinOrthoFullLength 1,2 '\t' b all|perl -lne 'if ($_=~/NO MATCH/){$_=~s/==NO MATCH/No/g;print $_;}else{print "$_\tYes";}' > OF2_KinOrtho.allPairs.e3.KinOrthoKinDom
+# Match all pairs list with OrthoFinder orthologs
+match.pl OF2_BLAST_MSA_HumanPKD.list_all 1,2 OF2_KinOrtho.allPairs.e3.KinOrthoKinDom 1,2 '\t' b all|perl -lne 'if ($_=~/NO MATCH/){$_=~s/==NO MATCH/No/g;print $_;}else{print "$_\tYes";}' > OF2_KinOrtho.allPairs.e4.OF2_BLAST_MSA
+
+# Add species name
+cat OF2_KinOrtho.allPairs.e4|perl -e 'open(IN,"../../databases/QfO_2011/id_species.map.e1"); while(<IN>){chomp;@a=split(/\t/,$_);$hash{$a[2]}=$a[1];}while(<>){chomp;@b=split(/\t/,$_);if (exists $hash{$b[1]}){print "$_\t$hash{$b[1]}\n";}}'|sort -k1,1 -k7,7 > OF2_KinOrtho.allPairs.e5.speciesName
+# Flatten the file for every species match
+../flatten_species.pl OF2_KinOrtho.allPairs.e5.speciesName > OF2_KinOrtho.allPairs.e6.speciesFlattened
+
+#Get counts ofr diffferent matches
+less OF2_KinOrtho.allPairs.e4.OF2_BLAST_MSA|cut -f1,3-|sort|uniq -c|less
+less OF2_KinOrtho.allPairs.e4.OF2_BLAST_MSA|cut -f1,3,6|sort|uniq -c|less
+
 ############################################################
 ## Long term work
 ## Update everything associated with CAZy 
