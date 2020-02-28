@@ -24,15 +24,15 @@
 # mkdir seq_pages
 # cd seq_pages
 fam_num=$1
-# #### Section 1 : Download CAZy pages #####
-# for (( i=1; i<=$fam_num; i++ )); do 		#[num1]
-# 	wget -q -O GT${i}_all.html "http://www.cazy.org/GT${i}_all.html#pagination_PRINC"
-# 	pg_count=$(grep nofollow GT${i}_all.html |grep -v pagination|cut -f2 -d'>'|cut -f1 -d'<')
-# 	for (( c=1; c<$pg_count; c++ )); do
-# 		wget -O GT${i}_${c}.html "http://www.cazy.org/GT${i}_all.html?debut_PRINC=${c}000#pagination_PRINC";
-# 	done
-# done
-# #### End Section 1 #######################
+#### Section 1 : Download CAZy pages #####
+for (( i=5; i<=$fam_num; i++ )); do 		#[num1]
+	wget -q -O GT${i}_all.html "http://www.cazy.org/GT${i}_all.html#pagination_PRINC"
+	pg_count=$(grep nofollow GT${i}_all.html |grep -v pagination|cut -f2 -d'>'|cut -f1 -d'<')
+	for (( c=1; c<$pg_count; c++ )); do
+		wget -O GT${i}_${c}.html "http://www.cazy.org/GT${i}_all.html?debut_PRINC=${c}000#pagination_PRINC";
+	done
+done
+#### End Section 1 #######################
 
 # #### Section 2 : Parse the downloaded pages to get alist of IDs #######
 # if [ -d "../../Seq/Tables" ]; then

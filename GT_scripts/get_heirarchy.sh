@@ -1241,14 +1241,22 @@ match.pl OF2_BLAST_MSA_HumanPKD.list_all 1,2 OF2_KinOrtho.allPairs.e3.KinOrthoKi
 
 # Add species name
 cat OF2_KinOrtho.allPairs.e4|perl -e 'open(IN,"../../databases/QfO_2011/id_species.map.e1"); while(<IN>){chomp;@a=split(/\t/,$_);$hash{$a[2]}=$a[1];}while(<>){chomp;@b=split(/\t/,$_);if (exists $hash{$b[1]}){print "$_\t$hash{$b[1]}\n";}}'|sort -k1,1 -k7,7 > OF2_KinOrtho.allPairs.e5.speciesName
-# Flatten the file for every species match
+# Flatten the file for every speciesi match
 ../flatten_species.pl OF2_KinOrtho.allPairs.e5.speciesName > OF2_KinOrtho.allPairs.e6.speciesFlattened
 
 #Get counts ofr diffferent matches
 less OF2_KinOrtho.allPairs.e4.OF2_BLAST_MSA|cut -f1,3-|sort|uniq -c|less
 less OF2_KinOrtho.allPairs.e4.OF2_BLAST_MSA|cut -f1,3,6|sort|uniq -c|less
 
+##########
+# Buld a hmm from a single protein query sequence
+hhblits -i t3 -o t3.hhr -oa3m t3.a3m -n 1 -d ~/tools/hh-suite/databases/pfam
+hmmbuild t3.hmm t3.a3m
+hmmsearch -domtblout t3.domout t3.hmm epk.fasta > t3.hmmsaerch
+cat individual_runs/*domout|grep -v '^#'|sed 's/ \+/~/g23;s/ \+/\t/g;s/~/ /g' > allHmmHits
+
 ############################################################
+## Working in update_cazy_wrapper.sh
 ## Long term work
 ## Update everything associated with CAZy 
 ## 1) CAZy pages

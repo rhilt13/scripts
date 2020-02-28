@@ -3,16 +3,18 @@
 use Data::Dumper;
 #use Bio::SeqIO;
 
-#Ver 0.2
+#Ver 0.4
 
 # $ARGV[0] - 1st file with columns to be matched
 # $ARGV[1] - which column from 1st file
-# $ARGV[2] - 2nd file with columns to be matched
-# $ARGV[3] - Column no. from file 2 to match
-# $ARGV[4] - Delimeter ([ ,\t])
-# $ARGV[5] - both: print columns from both files
+# $ARGV[2] - Delimeter for the first file ([ ,\t])
+# $ARGV[3] - 2nd file with columns to be matched
+# $ARGV[4] - Column no. from file 2 to match
+# $ARGV[5] - Delimeter for the second file ([ ,\t])
+# $ARGV[6] - both: print columns from both files
 #			 print columns from only 2nd file
-# $ARGV[6] - all: print all lines with "=NO MATCH" tag at the end of line for no matches
+# $ARGV[7] - all: print all lines with "=NO MATCH" tag at the end of line for no matches
+
 # match.pl file1 1 file2 1
 
 # Notes:
@@ -24,6 +26,8 @@ use Data::Dumper;
 # Ver0.2 - Added options to specify columns to be matched
 #03/06/2018
 # Ver0.3 - Can match multiple columns
+#02/18/2020
+# Ver0.4 - Two files can have differnet delimeters; Input arguments shifted
 
 if ($ARGV[1]=~/^[0-9]+$/){
 	$col1=$ARGV[1]-1;
@@ -36,7 +40,7 @@ open(IN,$ARGV[0]);
 while(<IN>){
 	chomp;
 	$_=~s/^\s+|\s+$//g;
-	@a=split(/$ARGV[4]/,$_);
+	@a=split(/$ARGV[2]/,$_);
 	# $a[1]=$a[1]*3-3;
 	# $hash{$a[0]}{$a[1]}=1;
 	# $hash{$_}=1;
@@ -54,17 +58,17 @@ while(<IN>){
 }
 #  print Dumper(\%hash);
 ## Compare column in 2nd file
-if ($ARGV[3]=~/^[0-9]+$/){
-	$col2=$ARGV[3]-1;
+if ($ARGV[4]=~/^[0-9]+$/){
+	$col2=$ARGV[4]-1;
 	$use2='single';
 }else{
 	$use2='multiple';
-	@columns2=split(/,/,$ARGV[3]);
+	@columns2=split(/,/,$ARGV[4]);
 }
-open(IN2,$ARGV[2]);
+open(IN2,$ARGV[3]);
 while(<IN2>){
  	chomp;
- 	@a=split(/$ARGV[4]/,$_);
+ 	@a=split(/$ARGV[5]/,$_);
  	# @a=split(/\|/,$_);
  	# if (defined $hash{$a[0]}{$a[1]}){
  	if ($use2 eq 'multiple'){
@@ -78,13 +82,13 @@ while(<IN2>){
 		$key2=$a[$col2];
 	}
  	if (defined $hash{$key2}){
- 		if (exists $ARGV[5] and $ARGV[5] eq 'both'){
+ 		if (exists $ARGV[6] and $ARGV[6] eq 'both'){
 	 		print "$_\t$hash{$key2}\n";
  		}else{
  			print "$_\n";
  		}
  	}else{
- 		if (exists $ARGV[6] and $ARGV[6] eq 'all'){
+ 		if (exists $ARGV[7] and $ARGV[7] eq 'all'){
  			print "$_\t==NO MATCH\n";
  		}
  	}
