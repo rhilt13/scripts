@@ -1255,6 +1255,8 @@ hmmbuild t3.hmm t3.a3m
 hmmsearch -domtblout t3.domout t3.hmm epk.fasta > t3.hmmsaerch
 cat individual_runs/*domout|grep -v '^#'|sed 's/ \+/~/g23;s/ \+/\t/g;s/~/ /g' > allHmmHits
 
+##########
+match.pl monkey 1 '\t' human 1 '\t' both all|sed 's/==NO MATCH/--/' > a; match.pl mouse 1 '\t' a 1 '\t' both all|sed 's/==NO MATCH/--/' > b; match.pl rat 1 '\t' b 1 '\t' both all|sed 's/==NO MATCH/--/'  > c; match.pl bovine 1 '\t' c 1 '\t' both all|sed 's/==NO MATCH/--/'  > d; match.pl pig 1 '\t' d 1 '\t' both all|sed 's/==NO MATCH/--/'  > e
 ############################################################
 ## Working in update_cazy_wrapper.sh
 ## Long term work
