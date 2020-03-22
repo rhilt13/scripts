@@ -2,7 +2,7 @@
 
 use Data::Dumper;
 
-# Ver: 1.1.0
+# Ver: 1.1.1
 # Started versioning after adding the sel-pos option
 
 # works only if you wish to print a single cma file
@@ -68,6 +68,7 @@ use Data::Dumper;
 
 # Log:
 # 1.1.0 -> Replaced all cases of direct_seq which was printing wrong seq for ids
+# 1.1.1 -> rem-dup keeps the sequence with more aligned positions by default
 
 # sub warn {   
 # 	no warnings 'once';
@@ -567,19 +568,34 @@ if ($ARGV[1] eq 'rename-dup'){
 ########## Remove duplicated sequences ###################
 if ($ARGV[1] eq 'rem-dup'){
 	foreach $id(sort { $a <=> $b } keys(%len)){
+		$aln = () = $_ =~ m/\p{Uppercase}/g;
 		if (!(defined($print_hash{$seq_id{$id}}))){
 			$ct++;
-			$print_hash{$seq_id{$id}}=1;
-			$out .= "\$$ct=$len{$id}($prof_len):\n";
-			$out .= ">$seq_id{$id}";
+			$print_hash{$seq_id{$id}}=$aln;
+			$ct_hash{$seq_id{$id}}=$ct;
+			$out{$ct} = "\$$ct=$len{$id}($prof_len):\n";
+			$out{$ct} .= ">$seq_id{$id}";
 			if (exists $desc_hash{$id}){
-					$out .=" $desc_hash{$id}";
+					$out{$ct} .=" $desc_hash{$id}";
 			}
-			$out .="\n$seq{$id}\n\n";
+			$out{$ct} .="\n$seq{$id}\n\n";
+		}else{
+			if ($aln > $print_hash{$seq_id{$id}}){
+				$print_hash{$seq_id{$id}}=$aln;
+				$hitct=$ct_hash{$seq_id{$id}};
+				$out{$hitct} = "\$$hitct=$len{$id}($prof_len):\n";
+				$out{$hitct} .= ">$seq_id{$id}";
+			if (exists $desc_hash{$id}){
+					$out{$hitct} .=" $desc_hash{$id}";
+			}
+			$out{$hitct} .="\n$seq{$id}\n\n";
+			}
 		}
 	}
 	print "$sep1_1$ct$sep1_2\n$sep2\n";
-	print $out;
+	foreach $id(sort { $a <=> $b } keys(%out)){
+		print $out{$id};
+	}
 	print "$sep3\n";
 }
 ##### End Remove duplicated sequences ####################

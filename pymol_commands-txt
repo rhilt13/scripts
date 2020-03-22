@@ -27,6 +27,8 @@ set stick_radius, 0.15
 
 set cartoon_gap_cutoff, 0
 
+set cartoon_helix_radius, 0.8
+
 bg_color white
 
 #set cartoon_color, red, <object>
@@ -82,7 +84,17 @@ label n. c1 and i. 702, "GalNAc"
 Click on Mouse mode to go to Editing mode
 Ctrl + Left Click and drag labels 
 ################
+set_color new_red= [250,22,63]
+set color dblue= [0.05 , 0.19 , 0.57]
 
+color new_red, ss h
+color new_blue, ss s
+color green, ss l+''
+
+When the colour bleeds from the ends of helices and sheets into loops, do:
+set cartoon_discrete_colors, 1
+
+##########################
 set label_font_id, 8
 set label_size, 14
 
