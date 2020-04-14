@@ -31,7 +31,8 @@ while($seq=$new->next_seq){
 }
 
 foreach $id(@a){
-	if (exists $id_hash{$id}){
+	if (exists $hash{$id} && !defined $h2{$hash{$id}}){
 		print ">$id_hash{$id}\n$hash{$id}\n";
+		$h2{$hash{$id}}=1;
 	}
 }
