@@ -1259,11 +1259,20 @@ cat individual_runs/*domout|grep -v '^#'|sed 's/ \+/~/g23;s/ \+/\t/g;s/~/ /g' > 
 match.pl monkey 1 '\t' human 1 '\t' both all|sed 's/==NO MATCH/--/' > a; match.pl mouse 1 '\t' a 1 '\t' both all|sed 's/==NO MATCH/--/' > b; match.pl rat 1 '\t' b 1 '\t' both all|sed 's/==NO MATCH/--/'  > c; match.pl bovine 1 '\t' c 1 '\t' both all|sed 's/==NO MATCH/--/'  > d; match.pl pig 1 '\t' d 1 '\t' both all|sed 's/==NO MATCH/--/'  > e
 
 #########
+# Get ordered list of patterns from .pttrns file
+less ../spikeRbd_sel1.pttrns|grep '^1'|cut -f2 -d' '|tr ',' '\n'|sed 's/\([A-Z]\)/\1 /g'|rev|sed 's/ /~/'|rev|sed 's/ //g;s/~/ /'|sort -k2,2n|less
+
+#########
+# Work with pdb files 
+# http://www.bonvinlab.org/pdb-tools/
+
+#########
 ## Get 3-state secondary structure assignment from dssp
 dssp 2d0j.pdb > 2d0i.dssp
 # cat -n the file to remove all lines till the header of table
 less ChainA_Chain_A_Glycans.dssp|sed '1,28d'|sed 's/^ \+//;s/ \+/,/;s/ \+/,/;s/ \+/,/;'|cut -f1-3 -d' '|sed 's/ \+/,/;s/,$/,-/' > ChainA_Chain_A_Glycans.dssp.e1
 less ChainA_Chain_A_Glycans.dssp.e1|cut -f4,5 -d','|perl -e 'while(<>){chomp;@a=split(/,/,$_);$seq.=$a[0];if ($a[1]=~/[GHI]/){$ss.="H";}elsif ($a[1]=~/[BE]/){$ss.="S";}else{$ss.="L";}}print "$seq\n$ss\n";'|less
+
 ############################################################
 ## Working in update_cazy_wrapper.sh
 ## Long term work

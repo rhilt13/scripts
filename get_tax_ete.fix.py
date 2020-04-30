@@ -40,9 +40,8 @@ def main(args):
 
 #	## Get taxIDs for all unique species
 	name2tax=ncbi.get_name_translator(sp_list)
-	# print name2tax
+	# print(name2tax)
 	sp_tax_info={}
-
 #	## Get lineages for each taxID
 	for sp_name in name2tax:
 		# print sp_name,name2tax[sp_name]
@@ -50,10 +49,14 @@ def main(args):
 		names = ncbi.get_taxid_translator(lineage)
 		# print [names[taxid] for taxid in lineage][2]
 		## Select what information from lineage to keep for output
-		if [names[taxid] for taxid in lineage][2] == "Eukaryota":
-			sp_tax_info[sp_name]=[names[taxid] for taxid in lineage][4]
+		taxHier=[names[taxid] for taxid in lineage]
+		if taxHier[2] == "Eukaryota":
+			try:
+				sp_tax_info[sp_name]=taxHier[4]
+			except IndexError:
+				sp_tax_info[sp_name]=taxHier.pop()
 		else:
-			sp_tax_info[sp_name]=[names[taxid] for taxid in lineage][2]
+			sp_tax_info[sp_name]=taxHier[2]
 	# print sp_tax_info
 
 #	## Map Lineages back to accession IDs and print

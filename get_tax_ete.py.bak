@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/python
 
 import sys
 from ete3 import NCBITaxa
@@ -59,10 +59,10 @@ def main(args):
 #	## Map Lineages back to accession IDs and print
 	for ids in sp_map:
 		if sp_map[ids] in sp_tax_info:
-			print(ids,"\t",sp_map[ids],"\t",sp_tax_info[sp_map[ids]])
+			print ids,"\t",sp_map[ids],"\t",sp_tax_info[sp_map[ids]]
 		else:
 			trigger=1
-			print("ERROR: Tax info for ",ids,sp_map[ids]," not found")
+			print "ERROR: Tax info for ",ids,sp_map[ids]," not found"
 
 	if trigger == 1:
 		sys.exit("##### ERRORS. Some species not found !!$$!!")		
