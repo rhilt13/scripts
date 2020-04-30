@@ -59,7 +59,7 @@ done
 # cat cazy_allTable.e1|grep '^GT-lyso' > cazy_GT-lyso_Table
 
 # for i in `ls *_Table`; do 
-# 	cat $i|cut -f5 >$i.IDs;
+# 	cat $i|cut -f6|sort -u >$i.IDs;
 # done
 # #### End Section 3 #######################
 
@@ -75,7 +75,7 @@ done
 # for i in `ls *_Table`; do
 # 	j=$(echo $i|cut -f1,2 -d'_');
 #	cat $i|perl -lne '@a=split(/\t/,$_);print "$a[4]\t$a[3]";' |grep -v -P '^\t' > ../tax/${j}.list;
-# 	get_tax_ete.py -i ../tax/${j}.list|grep -v '^ERROR' > ../tax/${j}_genbank.tax;
+# 	get_tax_ete.fix.py -i ../tax/${j}.list|grep -v '^ERROR' > ../tax/${j}_genbank.tax;
 # done
 # #### End Section 4 #######################
 

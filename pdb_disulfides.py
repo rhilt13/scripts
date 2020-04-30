@@ -41,7 +41,20 @@ resolution = structure.header['resolution']
 #             print residue1, residue1.get_resname(), a #, #residue1[a]
 #     # break
 
+p = re.compile('(SSBOND)[a-z]*')
+count_ssbonds = 0
+resid_i=[]
+resid_j=[]
+infile=open(Strname,'r')  #open pdb file
+line=infile.readline()
+while (line):
+    if p.match(line):
+        count_ssbonds = count_ssbonds + 1
+        resid_i.append(int(line[19:21]))
+        resid_j.append(int(line[33:35]))
+    line =infile.readline()
 
+'''
 for residue1 in chain:
     for residue2 in chain:
         best_dist=1000
@@ -87,3 +100,4 @@ for residue1 in chain:
                                 # print residue1.get_resname(), residue1.get_id()[1], atom1.get_name(),atom1.get_bfactor(), residue2.get_resname(), residue2.get_id()[1], atom2.get_name(), atom1.get_bfactor(), distance 
                             # stop after first residue
         # break
+'''
