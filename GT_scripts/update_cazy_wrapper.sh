@@ -88,6 +88,19 @@ done
 # 	edit_cazyIDs.pl Tables/cazy_${j}_Table tax/cazy_${j}_genbank.tax $i > $i.IDedit;
 # done
 #### End Section 5 #######################
+
+# #### Section 6 : Summarize sequence counts #######
+rm editCnt tableCnt;
+for i in `ls *genbank.faa.IDedit`; do 
+	j=$(echo $i|cut -f2 -d'_');
+	cat $i|grep '^>'|cut -f1 -d'|'|suc|sed 's/>//g;s/-/\t/' >> editCnt;
+	cat Tables/cazy_${j}_Table|cut -f2|suc >> tableCnt;
+done
+match.pl tableCnt 2 '\t' editCnt 2 '\t' both > seqCnt;
+rm editCnt tableCnt;
+#### End Section 6 #######################
+
+
 #### END PART 1 ##########################
 
 ## PART 2 STRUCTURES
