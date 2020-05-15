@@ -20,14 +20,14 @@ while(<IN>){
   @a=split(/\t/,$_);
   $id_hash{$a[0]}=$a[1];
 }
-# print Dumper(\%id_hash);
+#print Dumper(\%id_hash);
 
 $new=Bio::SeqIO->new(-file=>$ARGV[1], -format=>"fasta");
 
 while($seq=$new->next_seq){
   $i=$seq->id;
   $d=$seq->desc;
-  $i=~s/\.[0-9]+$//g;
+  #$i=~s/\.[0-9]+$//g;
   # print $i;
   # $i=~s/[A-Z]$//;
   #@b=split(/\|/,$i);
@@ -39,6 +39,7 @@ while($seq=$new->next_seq){
 #  print "$b[3]\n";
   # $fid=$b[3];
   $fid=$i;
+  #print "$fid\n";
   if(defined $id_hash{$fid}){
   # if(defined $id_hash{$b[3]}){
   # if(defined $id_hash{$a[1]} && (!(defined($print_hash{$a[1]})))){

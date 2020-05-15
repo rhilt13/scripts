@@ -1,5 +1,12 @@
 #! /usr/bin/env perl
 
+# Ver: 0.1
+# Author: Rahil Taujale
+# Date: April 30, 2020
+
+# Simple script to write separate files based on a defined column.
+# Used to generate family and subfamily level tables in gtXplorer.
+
 use Data::Dumper;
 # Input:
 #	$ARGV[0]= table file with the data
@@ -9,6 +16,7 @@ use Data::Dumper;
 
 $sep=$ARGV[1];
 $key=$ARGV[2]-1;
+$header="#source	GTA_family	GTA_subfamily	SequenceID	Species	TaxID	Phylum	Kingdom	SequenceFullLength	DomainStart	DomainEnd	DomainSequence	FullSequence";
 open(IN,$ARGV[0]);
 while(<IN>){
 	@a=split(/$sep/,$_);
@@ -19,5 +27,6 @@ while(<IN>){
 foreach $k(sort keys %h1){
 	$file=$k.$ARGV[3];
 	open (OUT,">$file");
+	print OUT "$header\n";
 	print OUT "$h1{$k}";
 }
