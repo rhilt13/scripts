@@ -23,7 +23,7 @@
 # cd html
 # mkdir seq_pages
 # cd seq_pages
-# fam_num=$1
+fam_num=$1
 #### Section 1 : Download CAZy pages #####
 # for (( i=5; i<=$fam_num; i++ )); do 		#[num1]
 # 	wget -q -O GT${i}_all.html "http://www.cazy.org/GT${i}_all.html#pagination_PRINC"
@@ -35,15 +35,15 @@
 #### End Section 1 #######################
 
 # #### Section 2 : Parse the downloaded pages to get alist of IDs #######
-if [ -d "../../Seq/Tables" ]; then
-	rm ../../Seq/Tables/cazy_allTable
-else
-	mkdir ../../Seq
-	mkdir ../../Seq/Tables
-fi
-for k in `ls GT*`; do
-	parse_cazy.pl $k >> ../../Seq/Tables/cazy_allTable
-done
+#if [ -d "../../Seq/Tables" ]; then
+#	rm ../../Seq/Tables/cazy_allTable
+#else
+#	mkdir ../../Seq
+#	mkdir ../../Seq/Tables
+#fi
+#for k in `ls GT*`; do
+#	parse_cazy.pl $k >> ../../Seq/Tables/cazy_allTable
+#done
 # #### End Section 2 #######################
 # cd ../../Seq/Tables
 
@@ -90,14 +90,14 @@ done
 #### End Section 5 #######################
 
 # #### Section 6 : Summarize sequence counts #######
-rm editCnt tableCnt;
-for i in `ls *genbank.faa.IDedit`; do 
-	j=$(echo $i|cut -f2 -d'_');
-	cat $i|grep '^>'|cut -f1 -d'|'|suc|sed 's/>//g;s/-/\t/' >> editCnt;
-	cat Tables/cazy_${j}_Table|cut -f2|suc >> tableCnt;
-done
-match.pl tableCnt 2 '\t' editCnt 2 '\t' both > seqCnt;
-rm editCnt tableCnt;
+#rm editCnt tableCnt;
+#for i in `ls *genbank.faa.IDedit`; do 
+#	j=$(echo $i|cut -f2 -d'_');
+#	cat $i|grep '^>'|cut -f1 -d'|'|suc|sed 's/>//g;s/-/\t/' >> editCnt;
+#	cat Tables/cazy_${j}_Table|cut -f2|suc >> tableCnt;
+#done
+#match.pl tableCnt 2 '\t' editCnt 2 '\t' both > seqCnt;
+#rm editCnt tableCnt;
 #### End Section 6 #######################
 
 
@@ -136,14 +136,14 @@ rm editCnt tableCnt;
 # mkdir characterized_pages
 # cd characterized_pages
 
-# #### Section 1 : Download CAZy pages #####
-# for (( i=1; i<=$fam_num; i++ )); do 		#[num1]
-# 	wget -q -O GT${i}_characterized.html "http://www.cazy.org/GT${i}_characterized.html"
-# 	pg_count=$(grep nofollow GT${i}_characterized.html|tail -1|rev|cut -f3 -d'>'|rev|cut -f1 -d'<')
-# 	for (( c=1; c<$pg_count; c++ )); do
-# 		wget -O GT${i}characterized_${c}.html "http://www.cazy.org/GT${i}_characterized.html?debut_FUNC=${c}00#pagination_FUNC";
-# 	done
-# done
+#### Section 1 : Download CAZy pages #####
+for (( i=1; i<=$fam_num; i++ )); do 		#[num1]
+	wget -q -O GT${i}_characterized.html "http://www.cazy.org/GT${i}_characterized.html"
+	pg_count=$(grep nofollow GT${i}_characterized.html|tail -1|rev|cut -f3 -d'>'|rev|cut -f1 -d'<')
+	for (( c=1; c<$pg_count; c++ )); do
+		wget -O GT${i}characterized_${c}.html "http://www.cazy.org/GT${i}_characterized.html?debut_FUNC=${c}00#pagination_FUNC";
+	done
+done
 
 # #### Section 2 : Parse the downloaded pages to get alist of IDs #######
 # if [ -d "../../Characterized/Tables" ]; then
