@@ -29,19 +29,20 @@ while($seq=$new->next_seq){
   $i=$seq->id;
   $d=$seq->desc;
   $s=$seq->seq;
-  $i=~s/^\s+|\s+$//g;
-  @a=split(/\|/,$i);
+  #$i=~s/^\s+|\s+$//g;
+  #$i=~s/^\s+|\s+$//g;
+  #@a=split(/\|/,$i);
   # $srch=$i;
-  $srch=$a[1];
-#  $a[1]=~s/\.[0-9]+$|//g;
+  #$srch=$a[1];
+  #$a[1]=~s/\.[0-9]+$|//g;
   # print $a[1];
   # ($id)=($seq->id=~/(\S+):/);
-  # ($id)=($seq->id=~/(.*)_/);
+  ($id)=($seq->id=~/(.*)_/);
   # print $id;
   # print $id,"\n";
-  if($i=~/HUMAN/ && !defined $rep{$i}){
+  # if($i=~/HUMAN/ && !defined $rep{$i}){
   #if(defined $id_hash{$seq->id}){
-  #if(defined $id_hash{$i}){
+  if(defined $id_hash{$id}){
   # if(defined $id_hash{$i} && !defined $rep{$i}){  # remove sequences with duplicate genbank IDs
   # if(defined $id_hash{$srch}){	# remove sequences with duplicate genbank IDs
   # if ($id=~/GT12/){

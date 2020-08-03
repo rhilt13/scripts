@@ -490,12 +490,14 @@ if ($ARGV[1] eq 'editID'){
 		# print "$id\t$seq_id{$id}\t$id2{$seq_id{$id}}\t$seq_id_orig{$id}\n";
 		
 		# Temporary for editing Genbank Ids with gi numbers
-		@c=split(/\|/,$seq_id{$id});
-		# print "$c[3]\t$new_ID{$c[3]\n";
-		if (exists $new_ID{$c[3]}){		### Specify match unmatch here
+		# @c=split(/\|/,$seq_id{$id});
+		# print "$c[3]\t$new_ID{$c[3]\n"
+		$chk=$seq_id{$id};
+		# print "$chk\n";
+		if (exists $new_ID{$chk}){		### Specify match unmatch here
 			$ct++;
 			$out .= "\$$ct=$len{$id}($prof{$id}):\n";
-			$out .= ">$new_ID{$c[3]}\n$seq{$id}\n\n";
+			$out .= ">$new_ID{$chk}\n$seq{$id}\n\n";
 		
 #		if (exists $new_ID{$seq_id{$id}}){		### Specify match unmatch here
 #			$out .= ">$new_ID{$seq_id{$id}} $desc_hash{$id}\n$seq{$id}\n\n";

@@ -8,7 +8,7 @@ $Data::Dumper::Sortkeys = sub { [sort { $a <=> $b } keys %{$_[0]}] };
 # Larger this number more number of residues in consensus sequence
 # How many more gaps than residues
 # No of seq/3, round down - stringent 
-$gap_tol=0.4; 
+$gap_tol=0.4; #0.4
 
 $new=Bio::SeqIO->new(-file=>$ARGV[0], -format=>"fasta");	## multiple sequence alignment
 

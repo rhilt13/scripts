@@ -5,19 +5,14 @@
 # 		( Does not map all pdbs if omcBPPS set for that pdb family is not found)
 # 2) Use the pdb,cif file to extract the first residue position in pdb file, add this number to the start of mapped domain in the cma ID description.
 #		Use script Map pdb cma domains
-# Note: 
-#    Check pattern matching to grep sequence lines
-#    Check column number for sequence start and end 
-
-use Data::Dumper;
 
 if ($ARGV[0]=~/domain/){
 	open(IN,$ARGV[1]);	# PDB domain bounds file (pdbID,start,end)
 	while(<IN>){
 		chomp;
 		@a=split(/\t/,$_);
-		$start{$a[0]}=$a[2]; # $a[1]; Check to make sure right column is selected.
-		$end{$a[0]}=$a[4]; # $a[2];
+		$start{$a[0]}=$a[1];
+		$end{$a[0]}=$a[2];
 	}
 }elsif ($ARGV[0]=~/full/){
 	open(IN,$ARGV[1]);	# PDB full length bounds file (pdbID,start,end)
@@ -41,8 +36,7 @@ while(<IN2>){
 		if ($ARGV[0]=~/full/){
 			($offset)=($_=~/^>.*? +\{\|([0-9]+)\(/);
 		}
-	# }elsif($_=~/^\{/){
-	}elsif($_=~/^[A-Za-z]/){
+	}elsif($_=~/^\{/){
 		$_=~s/[*{}()]//g;
 		@seq=split(//,$_);
 		if (exists($start{$id})){
@@ -56,16 +50,20 @@ while(<IN2>){
 		$ct_aln=0;
 		$ct_gap=0;
 		foreach $res(@seq){
+			print "$id\t$res\t";
 			if ($res=~/[A-Z]/){
 				$ct_res++;
 				$ct_aln++;
+				print "$ct_aln\t$ct_res\n";
 			}elsif ($res=~/[a-z]/){
 				$ct_res++;
+				print "-\t$ct_res\n";
 			}elsif ($res=~/-/){
 				$ct_gap++;
 				$ct_aln++;
+				print "$ct_aln\t-\n";
 			}
-			print "$id\t$res\t$ct_aln\t$ct_res\n";
+#			print "$id\t$res\t$ct_aln\t$ct_res\n";
 		}
 	}
 }
