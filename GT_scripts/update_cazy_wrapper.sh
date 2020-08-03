@@ -114,12 +114,12 @@ rm editCnt tableCnt;
 
 # #### Section 2 : Generate Structure list table for each family #####
 # Get tables from the html pages
-# for i in `ls *_structure.html`; do 
-# 	less $i|grep '<title\|db=protein&val\|structureId'| \
-# 	sed 's/"//g;s/<br>/,/g;s/<b>//g;s/<\/b><\/a>//g;s/<\/td>//g'| \
-# 	perl -e 'while(<>){$_=~s/\n//g;$_=~s/\r//g;chomp;if ($_=~/^<title/){($fam)=($_=~/ (GT[0-9]+)</);}else{($a)=($_=~/_link>(.*)$/);if ($a=~/\[/){$a=lc($a);@b=split(/</,$a);print "$b[0],";}else{print "\n$fam\t$a\t";}}}print "\n";'| \
-# 	sed '1d' >${i}.table; 
-# done
+for i in `ls *structure.html`; do 
+	less $i|grep '<title\|db=protein&val\|uniprot\|structureId'| \
+	sed 's/"//g;s/<br>/,/g;s/<b>//g;s/<\/b><\/a>//g;s/<\/td>//g'| \
+	perl -e 'use List::Util qw(uniq);while(<>){$_=~s/\n//g;$_=~s/\r//g;chomp;if ($_=~/^<title/){($fam)=($_=~/ (GT[0-9]+)</);}elsif ($_=~/uniprot/){@up=($_=~m/uniprot\/(.*?) /g);@uup=uniq @up;foreach $upid(@uup){print "$upid,";}print "\t";}else{($a)=($_=~/_link>(.*)$/);if ($a=~/\[/){$a=lc($a);@b=split(/</,$a);print "$b[0],";}else{print "\n$fam\t$a\t";}}}print "\n";'| \
+	sed '1d' > ${i}.table; 
+done
 #### End Section 2 #######################
 
 # #### Section 3 : Move to directories and compile final lists #####

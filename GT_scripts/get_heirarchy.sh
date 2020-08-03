@@ -1273,6 +1273,21 @@ dssp 2d0j.pdb > 2d0i.dssp
 less ChainA_Chain_A_Glycans.dssp|sed '1,28d'|sed 's/^ \+//;s/ \+/,/;s/ \+/,/;s/ \+/,/;'|cut -f1-3 -d' '|sed 's/ \+/,/;s/,$/,-/' > ChainA_Chain_A_Glycans.dssp.e1
 less ChainA_Chain_A_Glycans.dssp.e1|cut -f4,5 -d','|perl -e 'while(<>){chomp;@a=split(/,/,$_);$seq.=$a[0];if ($a[1]=~/[GHI]/){$ss.="H";}elsif ($a[1]=~/[BE]/){$ss.="S";}else{$ss.="L";}}print "$seq\n$ss\n";'|less
 
+#########
+# Map pdb res number to profile alignment.
+# First, get a list of pdb ids from the pdb_seqres.txt rungaps file
+cat pdb_seqres.txt_aln.cma|grep '^>'|cut -f1 -d'_'|cut -f2 -d'>' > pdb_list1
+# Download cif files for all pdbs
+for i in `cat pdb_list1`; do wget https://files.rcsb.org/download/${i}.cif; done
+# Get pdb bounds for a pdb file
+for i in `ls *cif`; do get_pdb_bounds.pl $i; done > ../all_pdbBounds2.txt
+# Map pistion to the cma alignment
+list-aligned-pos-pdb.pl full all_pdbBounds2.txt pdb_seqres.txt_aln.cma > pdbPos-AlnPos.txt
+# Add family information to the mapping file
+# First get a family name in tab separated file
+# all_pdbList.famNames => Fam1	pdbID_chainID
+match.pl all_pdbList.famNames 2 '\t' pdbPos-AlnPos.txt 1 '\t' both|awk -F'\t' '{print $5"\t"$0}'|cut -f1-5 > pdbPos-AlnPos.txt.famNames
+
 ############################################################
 ## Working in update_cazy_wrapper.sh
 ## Long term work
