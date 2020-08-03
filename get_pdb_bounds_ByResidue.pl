@@ -5,6 +5,11 @@
 
 use Data::Dumper;
 
+dAAName = {'CYS': 'C', 'ASP': 'D', 'SER': 'S', 'GLN': 'Q', 'LYS': 'K',
+     'ILE': 'I', 'PRO': 'P', 'THR': 'T', 'PHE': 'F', 'ASN': 'N', 
+     'GLY': 'G', 'HIS': 'H', 'LEU': 'L', 'ARG': 'R', 'TRP': 'W', 
+     'ALA': 'A', 'VAL':'V', 'GLU': 'E', 'TYR': 'Y', 'MET': 'M'}
+
 open(IN,$ARGV[0]);	# pdb file in .cif format
 
 $line=0;
@@ -44,7 +49,7 @@ while(<IN>){
 for $chain(sort keys %atoms){
 	for ($i=0;$i<=$#{$atoms{$chain}};$i++){
 		# PDB_Chain 
-		print $pdb."_".$chain."\t$num{$chain}[$i]\t$res{$chain}[$i]\t$atoms{$chain}[$i]\t$mod{$chain}[$i]\n";
+		print $pdb."_".$chain."\t$num{$chain}[$i]\t$dAAName{$res{$chain}[$i]}\t$atoms{$chain}[$i]\t$mod{$chain}[$i]\n";
 	}
 	# print $pdb."_".$chain."\t".$res{$chain}[0]."\t".$atoms{$chain}[0]."\t".$res{$chain}[-1]."\t".$atoms{$chain}[-1],"\n";
 }
