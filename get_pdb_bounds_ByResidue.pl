@@ -5,10 +5,7 @@
 
 use Data::Dumper;
 
-dAAName = {'CYS': 'C', 'ASP': 'D', 'SER': 'S', 'GLN': 'Q', 'LYS': 'K',
-     'ILE': 'I', 'PRO': 'P', 'THR': 'T', 'PHE': 'F', 'ASN': 'N', 
-     'GLY': 'G', 'HIS': 'H', 'LEU': 'L', 'ARG': 'R', 'TRP': 'W', 
-     'ALA': 'A', 'VAL':'V', 'GLU': 'E', 'TYR': 'Y', 'MET': 'M'}
+%dAAName = (CYS=>'C', ASP=>'D', SER=>'S', GLN=>'Q', LYS=>'K', ILE=>'I',PRO=>'P',THR=>'T',PHE=>'F',ASN=>'N',GLY=>'G',HIS=>'H',LEU=>'L',ARG=>'R',TRP=>'W',ALA=>'A',VAL=>'V',GLU=>'E',TYR=>'Y',MET=>'M','-'=>'-');
 
 open(IN,$ARGV[0]);	# pdb file in .cif format
 
