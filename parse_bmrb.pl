@@ -12,6 +12,7 @@ $num=-1;
 $num1=-1;
 open(IN,$ARGV[0]);
 while(<IN>){
+	# print $_;
 	chomp;
 	$_=~s/^\s+//g;
 	$_=~s/\s+$//g;

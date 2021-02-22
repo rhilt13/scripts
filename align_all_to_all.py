@@ -63,29 +63,29 @@ def align_all_to_all(object_list=None,selection='name ca',cutoff=2,cycles=5,debu
         rms = [cmd.rms_cur('%s & %s' % (object_list[j],selection),'%s & %s' % (object_list[i],selection)),num_atoms]
 
       else:
-        print "Method: ",method
-        print "only 'align', 'super', 'cealign' and 'rms_cur' are accepted as methods"
+        print("Method: ",method)
+        print("only 'align', 'super', 'cealign' and 'rms_cur' are accepted as methods")
         sys.exit(-1)
 
       rmsd.setdefault(object_list[i],{})[object_list[j]] = rms[0]
       rmsd_list.append((object_list[j],object_list[i],rms[0],rms[1]))
       if debug and method != 'rms_cur':
-        print "Alignment of %s to %s:" % (object_list[j],object_list[i])
-        print "     Initial RMS: %6.3f for %d atoms" % (rms[3],rms[4])
-        print "     Final RMS: %6.3f for %d atoms after %d cycles\n" % (rms[0],rms[1],rms[2])
+        print("Alignment of %s to %s:" % (object_list[j],object_list[i]))
+        print("     Initial RMS: %6.3f for %d atoms" % (rms[3],rms[4]))
+        print("     Final RMS: %6.3f for %d atoms after %d cycles\n" % (rms[0],rms[1],rms[2]))
 
   rmsd_list.sort(lambda x,y: cmp(x[2],y[2]))
 # loop over dictionary and print out matrix of final rms values
   if debug:
     for object_name in object_list[:-1]:
-      print "%s: %s" % (object_name,str(rmsd[object_name]))
+      print("%s: %s" % (object_name,str(rmsd[object_name])))
 
-    print "\nSorted from best match to worst:"
+    print("\nSorted from best match to worst:")
     for r in rmsd_list:
-      print "%s to %s: %6.3f using %d atoms" % r
-    print ""
+      print("%s to %s: %6.3f using %d atoms" % r)
+    print("")
 
-  print "%6s" % " ",
+  print("%6s" % " ", end=' ')
   if full_matrix:
 # fill in other half of matrix
     for i in range(len(object_list)):
@@ -94,23 +94,23 @@ def align_all_to_all(object_list=None,selection='name ca',cutoff=2,cycles=5,debu
       rmsd[object_list[i]][object_list[i]] = 0
 
     for i in range(len(rmsd)):
-      print "%6s" % object_list[i],
-    print ""
+      print("%6s" % object_list[i], end=' ')
+    print("")
     for i in range(len(object_list)):
-      print "%6s" % object_list[i],
+      print("%6s" % object_list[i], end=' ')
       for j in range(len(object_list)):
-        print "%6.3f" % (rmsd[object_list[i]][object_list[j]]),
-      print ""
+        print("%6.3f" % (rmsd[object_list[i]][object_list[j]]), end=' ')
+      print("")
   else:
     for i in range(len(rmsd)):
-      print "%6s" % object_list[i+1],
-    print ""
+      print("%6s" % object_list[i+1], end=' ')
+    print("")
     for i in range(len(object_list)):
-      print "%6s" % object_list[i],
+      print("%6s" % object_list[i], end=' ')
       for k in range(i):
-        print "%6s" % " ",
+        print("%6s" % " ", end=' ')
       for j in range(i+1,len(object_list)):
-        print "%6.3f" % (rmsd[object_list[i]][object_list[j]]),
-      print ""
+        print("%6.3f" % (rmsd[object_list[i]][object_list[j]]), end=' ')
+      print("")
 
 cmd.extend('align_all_to_all',align_all_to_all)

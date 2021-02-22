@@ -42,7 +42,7 @@ while(<IN2>){
 		foreach $key(sort keys %hash){
 			# print "$key\t$hash{$key}\n";
 			# sub_modify($_, $key, $hash{$key});
-			$_=~ s/$key/$hash{$key}/g;
+			$_=~ s/$key/$hash{$key}/;
 		}
 		print "$_\n";
 	}

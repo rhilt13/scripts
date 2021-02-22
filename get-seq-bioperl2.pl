@@ -42,8 +42,8 @@ while($seq=$new->next_seq){
   # print $id,"\n";
   # if($i=~/HUMAN/ && !defined $rep{$i}){
   #if(defined $id_hash{$seq->id}){
-  if(defined $id_hash{$id}){
-  # if(defined $id_hash{$i} && !defined $rep{$i}){  # remove sequences with duplicate genbank IDs
+  # if(defined $id_hash{$id}){
+  if(defined $id_hash{$i} && !defined $rep{$i}){  # remove sequences with duplicate genbank IDs
   # if(defined $id_hash{$srch}){	# remove sequences with duplicate genbank IDs
   # if ($id=~/GT12/){
     $rep{$i}=1;
