@@ -11,7 +11,9 @@ $Data::Dumper::Sortkeys = sub { [sort { $a <=> $b } keys %{$_[0]}] };
 $gap_tol=0.4; #0.4
 
 $new=Bio::SeqIO->new(-file=>$ARGV[0], -format=>"fasta");	## multiple sequence alignment
-
+@n=split(/./,$ARGV[0]);
+$name=$n[0].".msa.cons";
+open(my $fh '>>', $name);
 while($seq=$new->next_seq){
 	$id=$seq->id;
 	$s=$seq->seq;
@@ -52,6 +54,7 @@ while($seq=$new->next_seq){
 # }
 
 ($cons,@best_res,@best_score)=Consensus($len,\%res,\%ct,\%ct_gap,\%ct_res);
+print $fh ">",$n[0],"\n",$cons,"\n";
 print $cons,"\n",length($cons),"\n";
 $cons=~s/-//g;
 print $cons,"\n",length($cons),"\n";
