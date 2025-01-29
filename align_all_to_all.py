@@ -73,7 +73,7 @@ def align_all_to_all(object_list=None,selection='name ca',cutoff=2,cycles=5,debu
         print("Alignment of %s to %s:" % (object_list[j],object_list[i]))
         print("     Initial RMS: %6.3f for %d atoms" % (rms[3],rms[4]))
         print("     Final RMS: %6.3f for %d atoms after %d cycles\n" % (rms[0],rms[1],rms[2]))
-
+  print(rmsd_list)
   rmsd_list.sort(lambda x,y: cmp(x[2],y[2]))
 # loop over dictionary and print out matrix of final rms values
   if debug:
